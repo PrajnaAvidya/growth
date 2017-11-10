@@ -3,7 +3,7 @@
         <v-container fluid="fluid">
             <div>
                 <h5>You have <strong>{{ stuff | currency }}</strong> stuff.</h5>
-                <h6>You are gaining {{ stuffPerSecond | currency }} stuff per second.</h6>
+                <h6>You are gaining {{ stuffPerSecondDisplayed | currency }} stuff per second.</h6>
                 <v-btn @click.native="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | round }}</v-btn>
                 <h6>Tickspeed: {{ tickSpeedDisplayed }}</h6>
             </div>
@@ -28,7 +28,7 @@
             </v-layout>
 
             <div v-show="orders[resetOrder].owned > 0">
-                <v-btn @click.native="reset()" :disabled="!canReset()" >Reset ({{ resetCount }})</v-btn> Start a new game with another order level & higher multiplier (Requires {{ resetAmount }} of order {{ resetOrder }})
+                <v-btn @click.native="reset()" :disabled="!canReset()" >Reset ({{ resetCount }})</v-btn> Start a new game with another order level & higher multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Order)
             </div>
         </v-container>
     </v-app>
@@ -62,6 +62,7 @@ function defaultData() {
     return {
         stuff: Big(10),
         stuffPerSecond: Big(0),
+        stuffPerSecondDisplayed: Big(0),
         tickSpeed: Big(1),
         tickSpeedDisplayed: "1000",
         tickSpeedMultiplier: 0.89,
@@ -203,6 +204,7 @@ export default {
 
             // increment stuff
             let stuffIncrement = this.stuffPerSecond.div(division);
+            this.stuffPerSecondDisplayed = this.stuffPerSecond.div(this.tickSpeed);
             this.stuff = this.stuff.plus(stuffIncrement);
 
             // recalculate stuff per second
@@ -226,7 +228,7 @@ export default {
             if (!this.disableAutoSave) {
                 this.saveGame();
             }
-        }.bind(this), 10000);
+        }.bind(this), 5000);
     }
 }
 </script>

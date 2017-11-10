@@ -44,6 +44,7 @@ export default {
         let gameData = {
             stuff: Big(saveData.stuff),
             stuffPerSecond: Big(saveData.stuffPerSecond),
+            stuffPerSecondDisplayed: Big(saveData.stuffPerSecondDisplayed),
             tickSpeed: Big(saveData.tickSpeed),
             tickSpeedDisplayed: saveData.tickSpeedDisplayed,
             tickSpeedMultiplier: saveData.tickSpeedMultiplier,

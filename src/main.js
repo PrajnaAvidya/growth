@@ -9,7 +9,7 @@ Vue.use(Vuetify);
 import 'vuetify/dist/vuetify.min.css';
 import 'material-design-icons/iconfont/material-icons.css';
 
-import Game from './Game';
+import Game from './game';
 
 Vue.config.productionTip = false;
 
