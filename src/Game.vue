@@ -122,7 +122,7 @@ export default {
                 return;
             }
             this.stuff = this.stuff.minus(this.tickSpeedCost);
-            this.tickSpeedCost = this.ticktickSpeedCostost.times(10);
+            this.tickSpeedCost = this.tickSpeedCost.times(10);
             this.tickSpeed = this.tickSpeed.times(this.tickSpeedMultiplier);
             if (this.tickSpeed.gt(0.1)) {
                 this.tickSpeedDisplayed = this.tickSpeed.times(1000).toFixed(0);

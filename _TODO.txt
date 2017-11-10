@@ -1,5 +1,6 @@
-first reset start time: 00:57
+first reset start time: 
 first reset end time: 
+first reset time: 
 
 more robust number display system/refactor utils (beyond nonillion)
 ---
