@@ -4,7 +4,7 @@
             <div>
                 <h5>You have <strong>{{ stuff | currency }}</strong> stuff.</h5>
                 <h6>You are gaining {{ stuffPerSecond | currency }} stuff per second.</h6>
-                <v-btn @click.native="upgradeTickSpeed()" :disabled="stuff.lt(tickCost)">Cost: {{ tickCost | round }}</v-btn>
+                <v-btn @click.native="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | round }}</v-btn>
                 <h6>Tickspeed: {{ tickSpeedDisplayed }}</h6>
             </div>
             <hr />
@@ -26,7 +26,10 @@
                     </v-btn>
                 </v-flex>
             </v-layout>
-            <v-btn @click.native="reset()" :disabled="!canReset()">Reset ({{ resetCount }})</v-btn> Start a new game with a higher multiplier (Requires {{ resetAmount }} of order {{ resetOrder }})
+
+            <div v-show="orders[resetOrder].owned > 0">
+                <v-btn @click.native="reset()" :disabled="!canReset()" >Reset ({{ resetCount }})</v-btn> Start a new game with another order level & higher multiplier (Requires {{ resetAmount }} of order {{ resetOrder }})
+            </div>
         </v-container>
     </v-app>
 </template>
@@ -34,102 +37,41 @@
 <script>
 import Big from "big.js";
 import Utils from "./modules/utils.js";
+import Orders from "./modules/orders.js";
 
 function defaultData() {
+    // generate orders from data
+    let orders = {};
+    let orderNumber = 1;
+    Orders.forEach(function (orderData) {
+        orders[orderNumber] = {
+            name: orderData.name,
+            multiplier: Big(1),
+            cost: Big(orderData.cost),
+            costMultiplier: Big(orderData.costMultiplier),
+            costToMultiplier: Big(orderData.cost).times(10),
+            owned: Big(0),
+            bought: 0,
+            increasePercentage: 0.00,
+        };
+
+        orderNumber ++;
+    });
+
     return {
-        stuff: Big('1E1000'),
+        stuff: Big(10),
         stuffPerSecond: Big(0),
         tickSpeed: Big(1),
         tickSpeedDisplayed: "1000",
-        tickCost: Big(1000),
+        tickSpeedMultiplier: 0.89,
+        tickSpeedCost: Big(1000),
         maxOrder: 4,
         resetCount: 0,
         lastFrame: null,
         highestOrder: 8,
         resetOrder: 4,
         resetAmount: 20,
-        orders: {
-            1: {
-                name: 'First',
-                multiplier: Big(1),
-                cost: Big(10),
-                costMultiplier: Big(1000),
-                costToMultiplier: Big(100),
-                owned: Big(0),
-                bought: 0,
-                increasePercentage: 0.00,
-            },
-            2: {
-                name: 'Second',
-                multiplier: Big(1),
-                cost: Big(100),
-                costMultiplier: Big(10000),
-                costToMultiplier: Big(1000),
-                owned: Big(0),
-                bought: 0,
-                increasePercentage: 0.00,
-            },
-            3: {
-                name: 'Third',
-                multiplier: Big(1),
-                cost: Big(10000),
-                costMultiplier: Big(100000),
-                costToMultiplier: Big(100000),
-                owned: Big(0),
-                bought: 0,
-                increasePercentage: 0.00,
-            },
-            4: {
-                name: 'Fourth',
-                multiplier: Big(1),
-                cost: Big(1E6),
-                costMultiplier: Big(1E6),
-                costToMultiplier: Big(1E7),
-                owned: Big(0),
-                bought: 0,
-                increasePercentage: 0.00,
-            },
-            5: {
-                name: 'Fifth',
-                multiplier: Big(1),
-                cost: Big(1E9),
-                costMultiplier: Big(1E6),
-                costToMultiplier: Big(1E10),
-                owned: Big(0),
-                bought: 0,
-                increasePercentage: 0.00,
-            },
-            6: {
-                name: 'Sixth',
-                multiplier: Big(1),
-                cost: Big(10E12),
-                costMultiplier: Big(10E9),
-                costToMultiplier: Big(1E13),
-                owned: Big(0),
-                bought: 0,
-                increasePercentage: 0.00,
-            },
-            7: {
-                name: 'Seventh',
-                multiplier: Big(1),
-                cost: Big(1E18),
-                costMultiplier: Big(1E12),
-                costToMultiplier: Big(1E16),
-                owned: Big(0),
-                bought: 0,
-                increasePercentage: 0.00,
-            },
-            8: {
-                name: 'Eighth',
-                multiplier: Big(1),
-                cost: Big(1E24),
-                costMultiplier: Big(1E15),
-                costToMultiplier: Big(1E25),
-                owned: Big(0),
-                bought: 0,
-                increasePercentage: 0.00,
-            },
-        }
+        orders: orders,
     }
 }
 
@@ -175,12 +117,12 @@ export default {
             this.upgradeOrder(order);
         },
         upgradeTickSpeed() {
-            if (this.stuff.lt(this.tickCost)) {
+            if (this.stuff.lt(this.tickSpeedCost)) {
                 return;
             }
-            this.stuff = this.stuff.minus(this.tickCost);
-            this.tickCost = this.tickCost.times(10);
-            this.tickSpeed = this.tickSpeed.times(0.89);
+            this.stuff = this.stuff.minus(this.tickSpeedCost);
+            this.tickSpeedCost = this.ticktickSpeedCostost.times(10);
+            this.tickSpeed = this.tickSpeed.times(this.tickSpeedMultiplier);
             if (this.tickSpeed.gt(0.1)) {
                 this.tickSpeedDisplayed = this.tickSpeed.times(1000).toFixed(0);
             } else if (this.tickSpeed.gt(0.01)) {
@@ -266,7 +208,14 @@ export default {
     },
 
     mounted() {
-        window.requestAnimationFrame(this.tick);    
+        window.requestAnimationFrame(this.tick);
+
+        // auto save
+        /*setInterval(function () {
+            if (!this.disableAutoSave) {
+                this.saveGame();
+            }
+        }.bind(this), 10000);*/
     }
 }
 </script>

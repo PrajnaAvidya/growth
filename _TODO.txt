@@ -1,4 +1,6 @@
-fix tickspeed display < 100
+save/load
+---
+more robust number display system
 ---
 tickspeed upgrade
 ---
