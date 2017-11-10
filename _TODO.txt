@@ -1,8 +1,9 @@
-save/load
+first reset start time: 00:57
+first reset end time: 
+
+more robust number display system/refactor utils (beyond nonillion)
 ---
-more robust number display system
----
-tickspeed upgrade
+tickspeed amount upgrade
 ---
 orders:
 1: 10 cost, 1k cost multiplier

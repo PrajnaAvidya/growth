@@ -38,6 +38,7 @@
 import Big from "big.js";
 import Utils from "./modules/utils.js";
 import Orders from "./modules/orders.js";
+import SaveLoad from "./modules/saveLoad.js";
 
 function defaultData() {
     // generate orders from data
@@ -173,6 +174,10 @@ export default {
             // replace data
             Object.assign(this.$data, newData);
         },
+        saveGame() {
+            SaveLoad.save(this.$data);
+            console.log("Saved");
+        },
         tick(timestamp) {
             // get time since last frame
             let progress = timestamp - this.lastFrame;
@@ -208,14 +213,20 @@ export default {
     },
 
     mounted() {
+        if (localStorage.getItem("SaveGame") != null) {
+            let saveData = SaveLoad.load();
+            Object.assign(this.$data, saveData);
+            console.log("Loaded");
+        }
+
         window.requestAnimationFrame(this.tick);
 
         // auto save
-        /*setInterval(function () {
+        setInterval(function () {
             if (!this.disableAutoSave) {
                 this.saveGame();
             }
-        }.bind(this), 10000);*/
+        }.bind(this), 10000);
     }
 }
 </script>
