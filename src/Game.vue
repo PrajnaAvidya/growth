@@ -5,10 +5,10 @@
                 <h5>You have <strong>{{ stuff | currency }}</strong> stuff.</h5>
                 <h6>You are gaining {{ stuffPerSecond | currency }} stuff per second.</h6>
                 <v-btn @click.native="upgradeTickSpeed()" :disabled="stuff.lt(tickCost)">Cost: {{ tickCost | round }}</v-btn>
-                <h6>Tickspeed: {{ tickSpeedDisplayed | round }}</h6>
+                <h6>Tickspeed: {{ tickSpeedDisplayed }}</h6>
             </div>
             <hr />
-            <v-layout v-for="(order, orderIndex) in orders" :key="orderIndex" v-show="orderIndex==1 || orders[orderIndex-1].owned > 0">
+            <v-layout v-for="(order, orderIndex) in orders" :key="orderIndex" v-show="orderIndex==1 || (orderIndex <= maxOrder && orders[orderIndex-1].owned > 0)">
                 <v-flex sm4>
                     <h4>{{ order.name }} Order x{{ order.multiplier | currency }}</h4>
                 </v-flex>
@@ -26,6 +26,7 @@
                     </v-btn>
                 </v-flex>
             </v-layout>
+            <v-btn @click.native="reset()" :disabled="!canReset()">Reset ({{ resetCount }})</v-btn> Start a new game with a higher multiplier (Requires {{ resetAmount }} of order {{ resetOrder }})
         </v-container>
     </v-app>
 </template>
@@ -36,12 +37,17 @@ import Utils from "./modules/utils.js";
 
 function defaultData() {
     return {
-        stuff: Big(100000),
+        stuff: Big('1E1000'),
         stuffPerSecond: Big(0),
         tickSpeed: Big(1),
-        tickSpeedDisplayed: 1000,
+        tickSpeedDisplayed: "1000",
         tickCost: Big(1000),
+        maxOrder: 4,
+        resetCount: 0,
         lastFrame: null,
+        highestOrder: 8,
+        resetOrder: 4,
+        resetAmount: 20,
         orders: {
             1: {
                 name: 'First',
@@ -83,9 +89,50 @@ function defaultData() {
                 bought: 0,
                 increasePercentage: 0.00,
             },
+            5: {
+                name: 'Fifth',
+                multiplier: Big(1),
+                cost: Big(1E9),
+                costMultiplier: Big(1E6),
+                costToMultiplier: Big(1E10),
+                owned: Big(0),
+                bought: 0,
+                increasePercentage: 0.00,
+            },
+            6: {
+                name: 'Sixth',
+                multiplier: Big(1),
+                cost: Big(10E12),
+                costMultiplier: Big(10E9),
+                costToMultiplier: Big(1E13),
+                owned: Big(0),
+                bought: 0,
+                increasePercentage: 0.00,
+            },
+            7: {
+                name: 'Seventh',
+                multiplier: Big(1),
+                cost: Big(1E18),
+                costMultiplier: Big(1E12),
+                costToMultiplier: Big(1E16),
+                owned: Big(0),
+                bought: 0,
+                increasePercentage: 0.00,
+            },
+            8: {
+                name: 'Eighth',
+                multiplier: Big(1),
+                cost: Big(1E24),
+                costMultiplier: Big(1E15),
+                costToMultiplier: Big(1E25),
+                owned: Big(0),
+                bought: 0,
+                increasePercentage: 0.00,
+            },
         }
     }
 }
+
 export default {
     data: function() {
         return defaultData();
@@ -110,7 +157,7 @@ export default {
             order.owned = order.owned.plus(1);
             order.bought ++;
 
-            order.costToMultiplier = (10 - order.bought) * order.cost;
+            order.costToMultiplier = Big(10).minus(order.bought).times(order.cost);
 
             if (order.bought == 10) {
                 this.upgradeOrder(order);
@@ -122,7 +169,7 @@ export default {
             }
 
             let buyAmount = 10 - order.bought;
-            this.stuff = this.stuff.minus(order.cost * buyAmount);
+            this.stuff = this.stuff.minus(order.cost.times(buyAmount));
             order.owned = order.owned.plus(buyAmount);
 
             this.upgradeOrder(order);
@@ -131,20 +178,59 @@ export default {
             if (this.stuff.lt(this.tickCost)) {
                 return;
             }
-
+            this.stuff = this.stuff.minus(this.tickCost);
             this.tickCost = this.tickCost.times(10);
             this.tickSpeed = this.tickSpeed.times(0.89);
-            this.tickSpeedDisplayed = this.tickSpeed.times(1000);
+            if (this.tickSpeed.gt(0.1)) {
+                this.tickSpeedDisplayed = this.tickSpeed.times(1000).toFixed(0);
+            } else if (this.tickSpeed.gt(0.01)) {
+                this.tickSpeedDisplayed = this.tickSpeed.times(1000).toFixed(1);
+            } else if (this.tickSpeed.gt(0.001)) {
+                this.tickSpeedDisplayed = this.tickSpeed.times(1000).toFixed(2);
+            } else {
+                this.tickSpeedDisplayed = this.tickSpeed.times(1000).toExponential(2);
+            }
         },
-
         upgradeOrder(order) {
             order.bought = 0;
 
-            order.multiplier = order.multiplier.times(2 );
+            order.multiplier = order.multiplier.times(2);
             order.cost = order.cost.times(order.costMultiplier);
-            order.costToMultiplier = (10 - order.bought) * order.cost;
+            order.costToMultiplier = Big(10).minus(order.bought).times(order.cost);
         },
+        canReset() {
+            return this.orders[this.resetOrder].owned.gte(this.resetAmount);
+        },
+        reset() {
+            if (!this.canReset()) {
+                return;
+            }
 
+            // load default data
+            let newData = defaultData();
+
+            // upgrade max order
+            newData.maxOrder = this.maxOrder + 1;
+            newData.resetCount = this.resetCount + 1;
+
+            // upgrade reset requirements
+            if (this.resetOrder < this.highestOrder) {
+                newData.resetOrder = this.resetOrder + 1;
+            } else {
+                newData.resetOrder = this.highestOrder;
+                newData.resetAmount = this.resetAmount + 20;
+            }
+
+            // upgrade multipliers
+            for (let maxOrder = 1; maxOrder <= newData.resetCount; maxOrder ++) {
+                for (let currentOrder = 1; currentOrder <= maxOrder && currentOrder <= this.highestOrder; currentOrder ++) {
+                    newData.orders[currentOrder].multiplier = newData.orders[currentOrder].multiplier.times(2);
+                }
+            }
+            
+            // replace data
+            Object.assign(this.$data, newData);
+        },
         tick(timestamp) {
             // get time since last frame
             let progress = timestamp - this.lastFrame;
@@ -160,11 +246,11 @@ export default {
                 }
 
                 if (this.orders[key].owned.gt(0)) {
-                    let orderIncrement = this.orders[key].owned.div(10 * division).times(this.orders[key].multiplier);
+                    let orderIncrement = this.orders[key].owned.div(division.times(10)).times(this.orders[key].multiplier);
                     this.orders[key-1].owned = this.orders[key-1].owned.plus(orderIncrement);
 
                     // set increase percentage
-                    this.orders[key-1].increasePercentage = this.orders[key].owned.div(this.orders[key-1].owned).times(10).div(this.tickSpeed).toFixed(2);
+                    this.orders[key-1].increasePercentage = this.orders[key].owned.times(this.orders[key].multiplier).div(this.orders[key-1].owned).times(10).div(this.tickSpeed).toFixed(2);
                 }
             }
 
