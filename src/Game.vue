@@ -4,7 +4,11 @@
             <div>
                 <h5>You have <strong>{{ stuff | currency }}</strong> stuff.</h5>
                 <h6>You are gaining {{ stuffPerSecondDisplayed | currency }} stuff per second.</h6>
+                <hr />
+                Reduce tickspeed by {{ tickSpeedReductionPercent }} percent.
+                <br />
                 <v-btn @click.native="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | round }}</v-btn>
+                <v-btn @click.natve="upgradeTickSpeedMax()" :disabled="stuff.lt(tickSpeedCost)">Buy Max</v-btn>
                 <h6>Tickspeed: {{ tickSpeedDisplayed }}</h6>
             </div>
             <hr />
@@ -60,12 +64,17 @@ function defaultData() {
     });
 
     return {
+        // debug flags
+        disableAutoSave: true,
+        disableAutoLoad: true,
+        startingCurrency: Big(1E6),
+
         stuff: Big(10),
         stuffPerSecond: Big(0),
         stuffPerSecondDisplayed: Big(0),
         tickSpeed: Big(1),
         tickSpeedDisplayed: "1000",
-        tickSpeedMultiplier: 0.89,
+        tickSpeedReductionPercent: 10,
         tickSpeedCost: Big(1000),
         maxOrder: 4,
         resetCount: 0,
@@ -120,11 +129,13 @@ export default {
         },
         upgradeTickSpeed() {
             if (this.stuff.lt(this.tickSpeedCost)) {
-                return;
+                return false;
             }
+            let tickSpeedMultiplier = (100-this.tickSpeedReductionPercent)/100;
+
             this.stuff = this.stuff.minus(this.tickSpeedCost);
             this.tickSpeedCost = this.tickSpeedCost.times(10);
-            this.tickSpeed = this.tickSpeed.times(this.tickSpeedMultiplier);
+            this.tickSpeed = this.tickSpeed.times(tickSpeedMultiplier);
             if (this.tickSpeed.gt(0.1)) {
                 this.tickSpeedDisplayed = this.tickSpeed.times(1000).toFixed(0);
             } else if (this.tickSpeed.gt(0.01)) {
@@ -134,6 +145,11 @@ export default {
             } else {
                 this.tickSpeedDisplayed = this.tickSpeed.times(1000).toExponential(2);
             }
+
+            return true;
+        },
+        upgradeTickSpeedMax() {
+            while (this.upgradeTickSpeed());
         },
         upgradeOrder(order) {
             order.bought = 0;
@@ -215,10 +231,15 @@ export default {
     },
 
     mounted() {
-        if (localStorage.getItem("SaveGame") != null) {
+        if (!this.disableAutoLoad && localStorage.getItem("SaveGame") != null) {
             let saveData = SaveLoad.load();
             Object.assign(this.$data, saveData);
             console.log("Loaded");
+        } else {
+            console.log("New");
+            if (this.startingCurrency) {
+                this.stuff = this.startingCurrency;
+            }
         }
 
         window.requestAnimationFrame(this.tick);
