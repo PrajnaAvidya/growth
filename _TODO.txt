@@ -1,8 +1,7 @@
+10 percent tickspeed reduction
 first reset start time: 
 first reset end time: 
 first reset time: 
-
-more robust number display system/refactor utils (beyond nonillion)
 ---
 tickspeed amount upgrade
 ---
@@ -16,13 +15,17 @@ orders:
 7: x100k, x100
 8: x1M, x1000
 ---
-6E = million
-9E = billion
-12E = trillion
-15E = quadrillion
-18E = quintillion
-21E = sextillion
-24E = septillion
-27E = octillion
-30E = nonillion
-33E = decillion
+3E = K
+6E = M
+9E = B
+12E = T
+15E = Qa
+18E = Qi
+21E = Sx
+24E = Sp
+27E = Oc
+30E = No
+33E = Dc
+36E = U(Dc)
+39E = D(Dc)
+42E = T(Dc)

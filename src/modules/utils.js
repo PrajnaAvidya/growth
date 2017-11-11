@@ -1,49 +1,39 @@
 import Big from "big.js";
 
 export default {
-    currency(value) {
+    round(value, decimal=false) {
+        value = Big(value);
         if (isNaN(value)) {
             return 0;
         }
-        if (value < 100) {
-            return Big(value).toFixed(1);
-        } else if (value <= 999999) {
+        if (decimal && value < 100) {
+            return value.toFixed(1);
+        } else if (value <= 999) {
             return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         } else {
             // display pretty formatted number
-            let displayedValue = Big(value);
-            let suffixes = ["", "", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"];
-            let index = Math.floor((displayedValue.e) / 3);
-            if (index >= suffixes.length) {
-                // outside of range
-                return value.toExponential(3);
-            }
-            let suffix = suffixes[Math.floor((displayedValue.e) / 3)];
-            let sigFig = (displayedValue.e % 3);
-            displayedValue.e = 3 + sigFig;
-            return displayedValue.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
-        }
-    },
+            if (value.lt("1E36")) {
+                let suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dec"];
+                let suffix = suffixes[Math.floor((value.e) / 3)];
+                let sigFig = (value.e % 3);
+                value.e = 3 + sigFig;
+                return value.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
+            } else if (value.lt("1E303")) {
+                // TODO
+                let bigSuffixes = ["Dec","Vig","Tri","Qua","Qui","Sex","Sep","Oct","Non"];
+                let littleSuffixes = ["U","D","T","Qa","Qi","Sx","Sp","Oc","No", ""];
 
-    round(value) {
-        if (isNaN(value)) {
-            return 0;
-        }
-        if (value <= 999999) {
-            return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        } else {
-            // display pretty formatted number
-            let displayedValue = Big(value);
-            let suffixes = ["", "", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"];
-            let index = Math.floor((displayedValue.e) / 3);
-            if (index >= suffixes.length) {
-                // outside of range
-                return value.toExponential(3);
+                let bigIndex = Math.floor((value.e-33)/30);
+                let littleIndex = (Math.floor((value.e-33)/3)-1) % 10;
+                let suffix = littleSuffixes[littleIndex] + bigSuffixes[bigIndex];
+
+                let sigFig = (value.e % 3);
+                value.e = 3 + sigFig;
+                
+                return value.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
+            } else {
+                return "Infinity";
             }
-            let suffix = suffixes[Math.floor((displayedValue.e) / 3)];
-            let sigFig = (displayedValue.e % 3);
-            displayedValue.e = 3 + sigFig;
-            return displayedValue.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
         }
     },
 

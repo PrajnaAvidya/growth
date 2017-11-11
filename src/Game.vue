@@ -2,31 +2,31 @@
     <v-app>
         <v-container fluid="fluid">
             <div>
-                <h5>You have <strong>{{ stuff | currency }}</strong> stuff.</h5>
-                <h6>You are gaining {{ stuffPerSecondDisplayed | currency }} stuff per second.</h6>
+                <h5>You have <strong>{{ stuff | stuff }}</strong> stuff.</h5>
+                <h6>You are gaining {{ stuffPerSecondDisplayed | stuff }} stuff per second.</h6>
                 <hr />
                 Reduce tickspeed by {{ tickSpeedReductionPercent }} percent.
                 <br />
-                <v-btn @click.native="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | round }}</v-btn>
-                <v-btn @click.natve="upgradeTickSpeedMax()" :disabled="stuff.lt(tickSpeedCost)">Buy Max</v-btn>
+                <v-btn @click.native="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | whole }}</v-btn>
+                <v-btn @click.native="upgradeTickSpeedMax()" :disabled="stuff.lt(tickSpeedCost)">Buy Max</v-btn>
                 <h6>Tickspeed: {{ tickSpeedDisplayed }}</h6>
             </div>
             <hr />
             <v-layout v-for="(order, orderIndex) in orders" :key="orderIndex" v-show="orderIndex==1 || (orderIndex <= maxOrder && orders[orderIndex-1].owned > 0)">
                 <v-flex sm4>
-                    <h4>{{ order.name }} Order x{{ order.multiplier | currency }}</h4>
+                    <h4>{{ order.name }} Order x{{ order.multiplier | multiplier }}</h4>
                 </v-flex>
                 <v-flex sm2>
-                    <div>{{ order.owned | round }} ({{ order.bought }}) (+{{ order.increasePercentage }}%/s)</div>
+                    <div>{{ order.owned | whole }} ({{ order.bought }}) (+{{ order.increasePercentage }}%/s)</div>
                 </v-flex>
                 <v-flex sm2>
-                    <v-btn @click.natve="buyOrder(order)" :disabled="stuff.lt(order.cost)">
-                        Cost: {{ order.cost | round }}
+                    <v-btn @click.native="buyOrder(order)" :disabled="stuff.lt(order.cost)">
+                        Cost: {{ order.cost | whole }}
                     </v-btn>
                 </v-flex>
                 <v-flex sm2>
-                    <v-btn @click.natve="buyMax(order)" :disabled="stuff.lt(order.costToMultiplier)">
-                        Until 10, Cost: {{ order.costToMultiplier | round }}
+                    <v-btn @click.native="buyMax(order)" :disabled="stuff.lt(order.costToMultiplier)">
+                        Until 10, Cost: {{ order.costToMultiplier | whole }}
                     </v-btn>
                 </v-flex>
             </v-layout>
@@ -34,6 +34,8 @@
             <div v-show="orders[resetOrder].owned > 0">
                 <v-btn @click.native="reset()" :disabled="!canReset()" >Reset ({{ resetCount }})</v-btn> Start a new game with another order level & higher multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Order)
             </div>
+
+            <v-btn@click.native="stuff = stuff.times(1E3)" v-show="cheatMode">Add Stuff</v-btn>
         </v-container>
     </v-app>
 </template>
@@ -67,7 +69,8 @@ function defaultData() {
         // debug flags
         disableAutoSave: true,
         disableAutoLoad: true,
-        startingCurrency: Big(1E6),
+        startingCurrency: Big(0),
+        cheatMode: true,
 
         stuff: Big(10),
         stuffPerSecond: Big(0),
@@ -92,10 +95,13 @@ export default {
     },
 
     filters: {
-        currency(value) {
-            return Utils.currency(value);
+        stuff(value) {
+            return Utils.round(value, true);
         },
-        round(value) {
+        multiplier(value) {
+            return Utils.round(value, true);
+        },
+        whole(value) {
             return Utils.round(value);
         }
     },
@@ -237,7 +243,7 @@ export default {
             console.log("Loaded");
         } else {
             console.log("New");
-            if (this.startingCurrency) {
+            if (this.startingCurrency.gt(0)) {
                 this.stuff = this.startingCurrency;
             }
         }
