@@ -14,7 +14,7 @@
             <hr />
             <v-layout v-for="(order, orderIndex) in orders" :key="orderIndex" v-show="orderIndex==1 || (orderIndex <= maxOrder && orders[orderIndex-1].owned > 0)">
                 <v-flex sm4>
-                    <h4>{{ order.name }} Order x{{ order.multiplier | multiplier }}</h4>
+                    <h4>{{ order.name }} Power x{{ order.multiplier | multiplier }}</h4>
                 </v-flex>
                 <v-flex sm2>
                     <div>{{ order.owned | whole }} ({{ order.bought }}) (+{{ order.increasePercentage }}%/s)</div>
@@ -32,7 +32,13 @@
             </v-layout>
 
             <div v-show="orders[resetOrder].owned > 0">
-                <v-btn @click.native="reset()" :disabled="!canReset()" >Reset ({{ resetCount }})</v-btn> Start a new game with another order level & higher multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Order)
+                <v-btn @click.native="reset()" :disabled="!canReset()" >Reset ({{ resetCount }})</v-btn>
+                <div v-if="maxOrder < highestOrder">
+                    Start a new game with another power level & higher multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Power)
+                </div>
+                <div v-else>
+                    Start a new game with a higher multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Power)
+                </div>
             </div>
 
             <v-btn@click.native="stuff = stuff.times(1E3)" v-show="cheatMode">Add Stuff</v-btn>
@@ -69,8 +75,8 @@ function defaultData() {
         // debug flags
         disableAutoSave: true,
         disableAutoLoad: true,
-        startingCurrency: Big(0),
-        cheatMode: true,
+        startingCurrency: Big(1E50),
+        cheatMode: false,
 
         stuff: Big(10),
         stuffPerSecond: Big(0),
@@ -196,6 +202,10 @@ export default {
             
             // replace data
             Object.assign(this.$data, newData);
+
+            if (this.startingCurrency.gt(0)) {
+                this.stuff = this.startingCurrency;
+            }
         },
         saveGame() {
             SaveLoad.save(this.$data);
