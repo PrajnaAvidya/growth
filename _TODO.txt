@@ -3,8 +3,6 @@ first reset start time:
 first reset end time: 
 first reset time: 
 ---
-tickspeed amount upgrade
----
 orders:
 1: 10 cost, 1k cost multiplier
 2: x10, x10

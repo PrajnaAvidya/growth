@@ -37,7 +37,7 @@
                     Start a new game with another power level & higher multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Power)
                 </div>
                 <div v-else>
-                    Start a new game with a higher multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Power)
+                    Start a new game with a higher multiplier and increased tickspeed multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Power)
                 </div>
             </div>
 
@@ -148,6 +148,8 @@ export default {
             this.stuff = this.stuff.minus(this.tickSpeedCost);
             this.tickSpeedCost = this.tickSpeedCost.times(10);
             this.tickSpeed = this.tickSpeed.times(tickSpeedMultiplier);
+
+            // set display tickspeed
             if (this.tickSpeed.gt(0.1)) {
                 this.tickSpeedDisplayed = this.tickSpeed.times(1000).toFixed(0);
             } else if (this.tickSpeed.gt(0.01)) {
@@ -185,12 +187,14 @@ export default {
             newData.maxOrder = this.maxOrder + 1;
             newData.resetCount = this.resetCount + 1;
 
-            // upgrade reset requirements
             if (this.resetOrder < this.highestOrder) {
+                // set next order for reset
                 newData.resetOrder = this.resetOrder + 1;
             } else {
+                // already at highest order so increment order amount & upgrade tickspeed multiplier
                 newData.resetOrder = this.highestOrder;
                 newData.resetAmount = this.resetAmount + 20;
+                newData.tickSpeedReductionPercent = this.tickSpeedReductionPercent + 1;
             }
 
             // upgrade multipliers
