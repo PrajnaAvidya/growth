@@ -27,7 +27,7 @@ export default {
                 let littleIndex = (Math.floor((value.e-33)/3)-1) % 10;
                 let suffix = littleSuffixes[littleIndex] + bigSuffixes[bigIndex];
 
-                let sigFig = (value.e % 3);
+                let sigFig = value.e % 3;
                 value.e = 3 + sigFig;
                 
                 return value.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
