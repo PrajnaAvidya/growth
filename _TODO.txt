@@ -1,4 +1,3 @@
-first reset start time: 
 more mathematical front end ui
 ---
 some way to unlock a 9th order
