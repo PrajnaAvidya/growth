@@ -5,14 +5,13 @@
                 <h5>You have <strong>{{ stuff | stuff }}</strong> stuff.</h5>
                 <h6>You are gaining {{ stuffPerSecond | stuff }} stuff per second.</h6>
                 <hr />
-                Reduce tickspeed by {{ tickSpeedReductionPercent }} percent.
-                <br />
-                <v-btn @click.native="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | whole }}</v-btn>
-                <v-btn @click.native="upgradeTickSpeedMax()" :disabled="stuff.lt(tickSpeedCost)">Buy Max</v-btn>
+                <div>Reduce tickspeed by {{ tickSpeedReductionPercent }} percent.</div>
+                <v-btn v-on:click="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | whole }}</v-btn>
+                <v-btn v-on:click="upgradeTickSpeedMax()" :disabled="stuff.lt(tickSpeedCost)">Buy Max</v-btn>
                 <h6>Tickspeed: {{ tickSpeedDisplayed }}</h6>
             </div>
             <hr />
-            <v-layout v-for="(order, orderIndex) in orders" :key="orderIndex" v-show="orderIndex==1 || (orderIndex <= maxOrder && orders[orderIndex-1].owned > 0)">
+            <v-layout v-for="(order, orderIndex) in orders" :key="orderIndex" v-show="orderIndex==1 || (orderIndex <= resetOrder && orders[orderIndex-1].owned > 0)">
                 <v-flex sm4>
                     <h4>{{ order.name }} Power x{{ order.multiplier | multiplier }}</h4>
                 </v-flex>
@@ -20,28 +19,30 @@
                     <div>{{ order.owned | whole }} ({{ order.bought }}) (+{{ order.increasePercentage }}%/s)</div>
                 </v-flex>
                 <v-flex sm2>
-                    <v-btn @click.native="buyOrder(order)" :disabled="stuff.lt(order.cost)">
+                    <v-btn v-on:click="buyOrder(order)" :disabled="stuff.lt(order.cost)">
                         Cost: {{ order.cost | whole }}
                     </v-btn>
                 </v-flex>
                 <v-flex sm2>
-                    <v-btn @click.native="buyMax(order)" :disabled="stuff.lt(order.costToMultiplier)">
+                    <v-btn v-on:click="buyMax(order)" :disabled="stuff.lt(order.costToMultiplier)">
                         Until 10, Cost: {{ order.costToMultiplier | whole }}
                     </v-btn>
                 </v-flex>
             </v-layout>
 
             <div v-show="orders[resetOrder].owned > 0">
-                <v-btn @click.native="reset()" :disabled="!canReset()" >Reset ({{ resetCount }})</v-btn>
-                <div v-if="maxOrder < highestOrder">
-                    Start a new game with another power level & higher multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Power)
+                <div>
+                    Once you reach {{ resetAmount }} owned of {{ orders[resetOrder].name }} Power you can reset with a boost.
                 </div>
-                <div v-else>
-                    Start a new game with a higher multiplier and increased tickspeed multiplier (Requires {{ resetAmount }}x of {{ orders[resetOrder].name }} Power)
+                <v-btn v-on:click="showReset = !showReset" :disabled="!canReset()" >Toggle Reset <span v-show="resetCount > 0">({{ resetCount }})</span></v-btn>
+                <div v-show="showReset">
+                    <v-btn v-show="resetOrder < highestOrder" v-on:click="reset('power')">Add another Power</v-btn>
+                    <v-btn v-show="tickSpeedReductionPercent < 99" v-on:click="reset('tickspeed')">Increase Tickspeed multiplier</v-btn>
+                    <v-btn v-on:click="reset('multiplier')">Increase Power multipliers</v-btn>
                 </div>
             </div>
 
-            <v-btn@click.native="stuff = stuff.times(1E3)" v-show="cheatMode">Add Stuff</v-btn>
+            Cheat Mode: <v-btn v-on:click="stuff = stuff.times(1E3)" v-show="cheatMode">Add Stuff</v-btn>
         </v-container>
     </v-app>
 </template>
@@ -84,7 +85,8 @@ function defaultData() {
         tickSpeedDisplayed: "1000",
         tickSpeedReductionPercent: 10,
         tickSpeedCost: Big(1000),
-        maxOrder: 4,
+        multiplierLevel: 0,
+        showReset: false,
         resetCount: 0,
         lastFrame: null,
         highestOrder: 8,
@@ -174,31 +176,40 @@ export default {
         canReset() {
             return this.orders[this.resetOrder].owned.gte(this.resetAmount);
         },
-        reset() {
+        reset(resetType) {
             if (!this.canReset()) {
                 return;
             }
 
             // load default data
             let newData = defaultData();
-
-            // upgrade max order
-            newData.maxOrder = this.maxOrder + 1;
+            
+            // load prestige data
             newData.resetCount = this.resetCount + 1;
+            newData.resetOrder = this.resetOrder;
+            newData.tickSpeedReductionPercent = this.tickSpeedReductionPercent;
+            newData.multiplierLevel = this.multiplierLevel;
+            newData.resetAmount = this.resetAmount;
 
-            if (this.resetOrder < this.highestOrder) {
-                // set next order for reset
+            // upgrade by reset type
+            if (resetType == 'power' && this.resetOrder < this.highestOrder) {
                 newData.resetOrder = this.resetOrder + 1;
-            } else {
-                // already at highest order so increment order amount & upgrade tickspeed multiplier
-                newData.resetOrder = this.highestOrder;
-                newData.resetAmount = this.resetAmount + 20;
+            } else if (resetType == 'tickspeed') {
                 newData.tickSpeedReductionPercent = this.tickSpeedReductionPercent + 1;
+            } else if (resetType == 'multiplier') {
+                newData.multiplierLevel = this.multiplierLevel + 1;
+            } else {
+                console.log("Invalid reset type: " + resetType)
             }
 
-            // upgrade multipliers
-            for (let maxOrder = 1; maxOrder <= newData.resetCount; maxOrder ++) {
-                for (let currentOrder = 1; currentOrder <= maxOrder && currentOrder <= this.highestOrder; currentOrder ++) {
+            // check if at highest order so increment order amount
+            if (this.resetOrder == this.highestOrder) {
+                newData.resetAmount = this.resetAmount + 20;
+            }
+
+            // apply multipliers
+            for (let multiplier = 1; multiplier <= newData.multiplierLevel; multiplier ++) {
+                for (let currentOrder = 1; currentOrder <= multiplier && currentOrder <= this.highestOrder; currentOrder ++) {
                     newData.orders[currentOrder].multiplier = newData.orders[currentOrder].multiplier.times(2);
                 }
             }
@@ -206,6 +217,7 @@ export default {
             // replace data
             Object.assign(this.$data, newData);
 
+            // add starting currency if defined
             if (this.startingCurrency.gt(0)) {
                 this.stuff = this.startingCurrency;
             }

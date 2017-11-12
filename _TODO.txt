@@ -1,7 +1,9 @@
+4th power max
 10 percent tickspeed reduction
 first reset start time: 
-first reset end time: 
-first reset time: 
+reset time: 21m
+---
+more mathematical front end ui
 ---
 some way to unlock a 9th order
 ---
