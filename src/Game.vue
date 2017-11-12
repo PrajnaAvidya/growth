@@ -31,14 +31,17 @@
             </v-layout>
 
             <div v-show="orders[resetOrder].owned > 0">
-                <div>
+                <div v-show="!canReset()">
                     Once you reach {{ resetAmount }} owned of {{ orders[resetOrder].name }} Power you can reset with a boost.
                 </div>
-                <v-btn v-on:click="showReset = !showReset" :disabled="!canReset()" >Toggle Reset <span v-show="resetCount > 0">({{ resetCount }})</span></v-btn>
+                <v-btn v-on:click="showReset = !showReset" :disabled="!canReset()" >Toggle Reset <span v-show="resetCurrency > 0">({{ resetCurrency }})</span></v-btn>
                 <div v-show="showReset">
-                    <v-btn v-show="resetOrder < highestOrder" v-on:click="reset('power')">Add another Power</v-btn>
-                    <v-btn v-show="tickSpeedReductionPercent < 99" v-on:click="reset('tickspeed')">Increase Tickspeed multiplier</v-btn>
-                    <v-btn v-on:click="reset('multiplier')">Increase Power multipliers</v-btn>
+                    Reset currency stored: {{ resetCurrency }} <br />
+                    <v-btn v-on:click="reset('none')">Reset with no bonus (save reset currency)</v-btn>
+                    <br />
+                    <v-btn v-show="resetOrder < highestOrder" v-on:click="reset('power')">Add another Power (Cost: {{ resetCostPower }})</v-btn>
+                    <v-btn v-show="tickSpeedReductionPercent < 99" v-on:click="reset('tickspeed')">Increase Tickspeed multiplier (Cost: {{ resetCostTickSpeed  }})</v-btn>
+                    <v-btn v-on:click="reset('multiplier')">Increase Power multipliers (Cost: {{ resetCostMultiplier }})</v-btn>
                 </div>
             </div>
 
@@ -89,12 +92,23 @@ function defaultData() {
         tickSpeedReductionPercent: 10,
         tickSpeedCost: Big(1000),
         multiplierLevel: 0,
+
         showReset: false,
         resetCount: 0,
+        resetCountPower: 0,
+        resetCountTickSpeed: 0,
+        resetCountMultiplier: 0,
+        resetCostPower: 1,
+        resetCostTickSpeed: 1,
+        resetCostMultiplier: 1,
+
         lastFrame: null,
         highestOrder: 8,
         resetOrder: 4,
         resetAmount: 20,
+        resetCurrency: 0,
+        resetCurrencyUnlockedThisRun: false,
+        
         orders: orders,
     }
 }
@@ -176,11 +190,28 @@ export default {
             order.cost = order.cost.times(order.costMultiplier);
             order.costToMultiplier = Big(10).minus(order.bought).times(order.cost);
         },
-        canReset() {
-            return this.orders[this.resetOrder].owned.gte(this.resetAmount);
+        canReset(resetType=null) {
+            if (!resetType || resetType == 'none') {
+                return this.orders[this.resetOrder].owned.gte(this.resetAmount);
+            }
+            
+            if (resetType == 'power' && this.resetOrder < this.highestOrder) {
+                return this.resetCurrency >= this.resetCostPower;
+            }
+            
+            if (resetType == 'tickspeed') {
+                return this.resetCurrency >= this.resetCostTickSpeed;
+            }
+            
+            if (resetType == 'multiplier') {
+                return this.resetCurrency >=this.resetCostMultiplier;
+            }
+
+            console.log("Invalid reset type: " + resetType);
+            return false;
         },
         reset(resetType) {
-            if (!this.canReset()) {
+            if (!this.canReset(resetType)) {
                 return;
             }
 
@@ -193,16 +224,27 @@ export default {
             newData.tickSpeedReductionPercent = this.tickSpeedReductionPercent;
             newData.multiplierLevel = this.multiplierLevel;
             newData.resetAmount = this.resetAmount;
+            newData.resetCountPower = this.resetCountPower;
+            newData.resetCountTickSpeed = this.resetCountTickSpeed;
+            newData.resetCountMultiplier = this.resetCountMultiplier;
+            newData.resetCurrency = this.resetCurrency;
+            newData.resetCurrencyUnlockedThisRun = false;
 
             // upgrade by reset type
             if (resetType == 'power' && this.resetOrder < this.highestOrder) {
                 newData.resetOrder = this.resetOrder + 1;
+                newData.resetCountPower = this.resetCountPower + 1;
+                newData.resetCurrency = this.resetCurrency - this.resetCostPower;
             } else if (resetType == 'tickspeed') {
                 newData.tickSpeedReductionPercent = this.tickSpeedReductionPercent + 1;
+                newData.resetCountTickSpeed = this.resetCountTickSpeed + 1;
+                newData.resetCurrency = this.resetCurrency - this.resetCostTickSpeed;
             } else if (resetType == 'multiplier') {
                 newData.multiplierLevel = this.multiplierLevel + 1;
-            } else {
-                console.log("Invalid reset type: " + resetType)
+                newData.resetCountMultiplier = this.resetCountMultiplier + 1;
+                newData.resetCurrency = this.resetCurrency - this.resetCostMultiplier;
+            } else if (resetType != 'none') {
+                console.log("Invalid reset type: " + resetType);
             }
 
             // check if at highest order so increment order amount
@@ -216,6 +258,11 @@ export default {
                     newData.orders[currentOrder].multiplier = newData.orders[currentOrder].multiplier.times(2);
                 }
             }
+
+            // recalculate new reset costs
+            newData.resetCostPower = newData.resetCountPower + 1;
+            newData.resetCostTickSpeed = Math.pow(2, newData.resetCountTickSpeed);
+            newData.resetCostMultiplier = Math.ceil(Math.log(newData.resetCountMultiplier + 1)) + 1;
             
             // replace data
             Object.assign(this.$data, newData);
@@ -259,6 +306,11 @@ export default {
             // increment stuff
             let stuffIncrement = this.stuffPerSecond.div(frameDivision);
             this.stuff = this.stuff.plus(stuffIncrement);
+
+            if (!this.resetCurrencyUnlockedThisRun && this.canReset()) {
+                this.resetCurrency = this.resetCurrency + 1;
+                this.resetCurrencyUnlockedThisRun = true;
+            }
 
             window.requestAnimationFrame(this.tick);
         },

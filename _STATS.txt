@@ -1,9 +1,24 @@
-4th power max
-10 percent tickspeed reduction
-prestige time: 21m
+prestige times
+===
+4TH POWER
+==
+no upgrades
+21m (misrecorded?)
+==
+TICKSPEED
+11 tickspeed
+24m
 
-4th power max
-11 percent tickspeed reduction
-start: 
-end: 
-prestige time: 
+12 tickspeed
+22m
+
+13 tickspeed
+20m
+
+14 tickspeed
+19m
+
+15 tickspeed
+18m
+
+16 tickspeed

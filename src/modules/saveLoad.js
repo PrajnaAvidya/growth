@@ -45,17 +45,29 @@ export default {
             stuff: Big(saveData.stuff),
             stuffPerSecond: Big(saveData.stuffPerSecond),
             stuffPerSecondDisplayed: Big(saveData.stuffPerSecondDisplayed),
+
             tickSpeed: Big(saveData.tickSpeed),
             tickSpeedDisplayed: saveData.tickSpeedDisplayed,
             tickSpeedMultiplier: saveData.tickSpeedMultiplier,
             tickSpeedCost: Big(saveData.tickSpeedCost),
             tickSpeedReductionPercent: saveData.tickSpeedReductionPercent,
-            resetCount: saveData.resetCount,
+            
             lastFrame: null,
             highestOrder: saveData.highestOrder,
+            multiplierLevel: saveData.multiplierLevel,
+
             resetOrder: saveData.resetOrder,
             resetAmount: saveData.resetAmount,
-            multiplierLevel: saveData.multiplierLevel,
+            resetCurrency: saveData.resetCurrency,
+            resetCurrencyUnlockedThisRun: saveData.resetCurrencyUnlockedThisRun,
+            resetCount: saveData.resetCount,
+            resetCountPower: saveData.resetCountPower,
+            resetCountTickSpeed: saveData.resetCountTickSpeed,
+            resetCountMultiplier: saveData.resetCountMultiplier,
+            resetCostPower: saveData.resetCostPower,
+            resetCostTickSpeed: saveData.resetCostTickSpeed,
+            resetCostMultiplier: saveData.resetCostMultiplier,
+
             orders: orders,
         };
         return gameData;
