@@ -2,39 +2,43 @@ import Big from "big.js";
 
 export default {
     round(value, decimal=false) {
-        value = Big(value);
         if (isNaN(value)) {
             return 0;
         }
+        value = Big(value);
+
         if (decimal && value < 100) {
             return value.toFixed(1);
-        } else if (value <= 999) {
-            return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        } else {
-            // display pretty formatted number
-            if (value.lt("1E36")) {
-                let suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dec"];
-                let suffix = suffixes[Math.floor((value.e) / 3)];
-                let sigFig = (value.e % 3);
-                value.e = 3 + sigFig;
-                return value.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
-            } else if (value.lt("1E303")) {
-                // TODO
-                let bigSuffixes = ["Dec","Vig","Tri","Qua","Qui","Sex","Sep","Oct","Non"];
-                let littleSuffixes = ["U","D","T","Qa","Qi","Sx","Sp","Oc","No", ""];
-
-                let bigIndex = Math.floor((value.e-33)/30);
-                let littleIndex = (Math.floor((value.e-33)/3)-1) % 10;
-                let suffix = littleSuffixes[littleIndex] + bigSuffixes[bigIndex];
-
-                let sigFig = value.e % 3;
-                value.e = 3 + sigFig;
-                
-                return value.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
-            } else {
-                return "Infinity";
-            }
         }
+        
+        if (value <= 999) {
+            return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        if (value.lt("1E36")) {
+            let suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dec"];
+            let suffix = suffixes[Math.floor((value.e) / 3)];
+            let sigFig = (value.e % 3);
+            value.e = 3 + sigFig;
+            return value.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
+        }
+        
+        if (value.lt("1E303")) {
+            // TODO
+            let bigSuffixes = ["Dec","Vig","Tri","Qua","Qui","Sex","Sep","Oct","Non"];
+            let littleSuffixes = ["U","D","T","Qa","Qi","Sx","Sp","Oc","No", ""];
+
+            let bigIndex = Math.floor((value.e-33)/30);
+            let littleIndex = (Math.floor((value.e-33)/3)-1) % 10;
+            let suffix = littleSuffixes[littleIndex] + bigSuffixes[bigIndex];
+
+            let sigFig = value.e % 3;
+            value.e = 3 + sigFig;
+            
+            return value.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
+        }
+
+        return "Infinity";
     },
 
     convertObjectToBig(objectData) {
