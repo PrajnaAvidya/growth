@@ -3,6 +3,8 @@ first reset start time:
 first reset end time: 
 first reset time: 
 ---
+some way to unlock a 9th order
+---
 orders:
 1: 10 cost, 1k cost multiplier
 2: x10, x10

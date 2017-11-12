@@ -3,7 +3,7 @@
         <v-container fluid="fluid">
             <div>
                 <h5>You have <strong>{{ stuff | stuff }}</strong> stuff.</h5>
-                <h6>You are gaining {{ stuffPerSecondDisplayed | stuff }} stuff per second.</h6>
+                <h6>You are gaining {{ stuffPerSecond | stuff }} stuff per second.</h6>
                 <hr />
                 Reduce tickspeed by {{ tickSpeedReductionPercent }} percent.
                 <br />
@@ -73,14 +73,13 @@ function defaultData() {
 
     return {
         // debug flags
-        disableAutoSave: true,
-        disableAutoLoad: true,
-        startingCurrency: Big(1E50),
+        disableAutoSave: false,
+        disableAutoLoad: false,
+        startingCurrency: Big(0),
         cheatMode: false,
 
         stuff: Big(10),
         stuffPerSecond: Big(0),
-        stuffPerSecondDisplayed: Big(0),
         tickSpeed: Big(1),
         tickSpeedDisplayed: "1000",
         tickSpeedReductionPercent: 10,
@@ -221,7 +220,8 @@ export default {
             this.lastFrame = timestamp;
 
             // how much to update current frame (factoring in tickspeed)
-            let division = Big(1000).times(this.tickSpeed).div(progress);
+            let frameDivision = Big(1000).div(progress);
+            let divisionTimesTickSpeed = frameDivision.times(this.tickSpeed);
 
             // increment orders
             for (let key in this.orders) {
@@ -230,7 +230,7 @@ export default {
                 }
 
                 if (this.orders[key].owned.gt(0)) {
-                    let orderIncrement = this.orders[key].owned.div(division.times(10)).times(this.orders[key].multiplier);
+                    let orderIncrement = this.orders[key].owned.div(divisionTimesTickSpeed.times(10)).times(this.orders[key].multiplier);
                     this.orders[key-1].owned = this.orders[key-1].owned.plus(orderIncrement);
 
                     // set increase percentage
@@ -238,13 +238,12 @@ export default {
                 }
             }
 
-            // increment stuff
-            let stuffIncrement = this.stuffPerSecond.div(division);
-            this.stuffPerSecondDisplayed = this.stuffPerSecond.div(this.tickSpeed);
-            this.stuff = this.stuff.plus(stuffIncrement);
-
             // recalculate stuff per second
             this.stuffPerSecond = this.orders[1].multiplier.times(Math.floor(this.orders[1].owned)).div(this.tickSpeed);
+
+            // increment stuff
+            let stuffIncrement = this.stuffPerSecond.div(frameDivision);
+            this.stuff = this.stuff.plus(stuffIncrement);
 
             window.requestAnimationFrame(this.tick);
         },
