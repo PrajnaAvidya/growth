@@ -42,7 +42,10 @@
                 </div>
             </div>
 
-            Cheat Mode: <v-btn v-on:click="stuff = stuff.times(1E3)" v-show="cheatMode">Add Stuff</v-btn>
+            <div v-show="cheatMode">
+                Cheat Mode: <v-btn v-on:click="stuff = stuff.times(1E3)">Add Stuff</v-btn>
+            </div>
+            
         </v-container>
     </v-app>
 </template>

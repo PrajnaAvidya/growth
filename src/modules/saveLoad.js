@@ -49,12 +49,13 @@ export default {
             tickSpeedDisplayed: saveData.tickSpeedDisplayed,
             tickSpeedMultiplier: saveData.tickSpeedMultiplier,
             tickSpeedCost: Big(saveData.tickSpeedCost),
-            maxOrder: saveData.maxOrder,
+            tickSpeedReductionPercent: saveData.tickSpeedReductionPercent,
             resetCount: saveData.resetCount,
             lastFrame: null,
             highestOrder: saveData.highestOrder,
             resetOrder: saveData.resetOrder,
             resetAmount: saveData.resetAmount,
+            multiplierLevel: saveData.multiplierLevel,
             orders: orders,
         };
         return gameData;
