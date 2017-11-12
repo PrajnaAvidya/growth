@@ -39,9 +39,9 @@
                     Reset currency stored: {{ resetCurrency }} <br />
                     <v-btn v-on:click="reset('none')">Reset with no bonus (save reset currency)</v-btn>
                     <br />
-                    <v-btn v-show="resetOrder < highestOrder" v-on:click="reset('power')">Add another Power (Cost: {{ resetCostPower }})</v-btn>
-                    <v-btn v-show="tickSpeedReductionPercent < 99" v-on:click="reset('tickspeed')">Increase Tickspeed multiplier (Cost: {{ resetCostTickSpeed  }})</v-btn>
-                    <v-btn v-on:click="reset('multiplier')">Increase Power multipliers (Cost: {{ resetCostMultiplier }})</v-btn>
+                    <v-btn v-show="resetOrder < highestOrder" v-on:click="reset('power')" :disabled="resetCurrency < resetCostPower">Add another Power (Cost: {{ resetCostPower }})</v-btn>
+                    <v-btn v-show="tickSpeedReductionPercent < 99" v-on:click="reset('tickspeed')" :disabled="resetCurrency < resetCostTickSpeed">Increase Tickspeed multiplier (Cost: {{ resetCostTickSpeed  }})</v-btn>
+                    <v-btn v-on:click="reset('multiplier')" :disabled="resetCurrency < resetCostMultiplier">Increase Power multipliers (Cost: {{ resetCostMultiplier }})</v-btn>
                 </div>
             </div>
 

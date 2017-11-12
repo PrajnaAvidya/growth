@@ -1,6 +1,10 @@
 more mathematical-looking front end ui
 ===
+menu:
 hard reset
+basic options (toggle scientific notation)
+stats
+import/export save
 ===
 some way to unlock a 9th order
 ===
