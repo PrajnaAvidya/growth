@@ -1,3 +1,9 @@
+IDEAS
+show time to prestige in console!
+make higher powers give more prestige currency if necessary (check times)
+gate higher powers behind prestige currency spent/gate max boost behind power level?
+bottom line - some mechanic to force higher powers, but dont let players be underequipped for them
+===
 more mathematical-looking front end ui
 ===
 menu:

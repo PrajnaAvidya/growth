@@ -93,6 +93,9 @@ function defaultData() {
         tickSpeedCost: Big(1000),
         multiplierLevel: 0,
 
+        lastFrame: null,
+        highestOrder: 8,
+
         showReset: false,
         resetCount: 0,
         resetCountPower: 0,
@@ -101,9 +104,6 @@ function defaultData() {
         resetCostPower: 1,
         resetCostTickSpeed: 1,
         resetCostMultiplier: 1,
-
-        lastFrame: null,
-        highestOrder: 8,
         resetOrder: 4,
         resetAmount: 20,
         resetCurrency: 0,

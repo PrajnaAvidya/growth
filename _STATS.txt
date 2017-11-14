@@ -1,9 +1,9 @@
 prestige times
 ===
-4TH POWER
+FOURTH POWER
 ==
 no upgrades
-21m (misrecorded?)
+25m
 ==
 TICKSPEED
 11 tickspeed
@@ -20,5 +20,31 @@ TICKSPEED
 
 15 tickspeed
 18m
+==
+MULTIPLIERS
+level 1
+19.5m
 
-16 tickspeed
+level 2
+14m
+
+level 3
+11m
+
+level 4
+5m
+
+level 5
+2m
+===
+FIFTH POWER
+==
+no upgrades
+12m to 1x5th
+20m to 20x4th
+29m to 20x5th
+===
+SIXTH POWER
+==
+no upgrades
+?
