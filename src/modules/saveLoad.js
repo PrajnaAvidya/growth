@@ -1,4 +1,6 @@
 import Big from "big.js";
+import Utils from "./utils.js";
+import Stats from './stats.js';
 import Orders from "./orders.js";
 
 function getSaveVersion() {
@@ -10,7 +12,13 @@ export default {
         let saveData = {
             version: getSaveVersion(),
             data: data,
+
+            stats: Stats.state,
         };
+
+        // update stuff stats on save
+        Stats.commit('setStuff', saveData.data.stuff);
+        Stats.commit('setStuffPerSecond', saveData.data.stuffPerSecond);
 
         localStorage.setItem("SaveGame", JSON.stringify(saveData));
     },
@@ -18,10 +26,12 @@ export default {
     load() {
         // load save data
         let saveDataRaw = JSON.parse(localStorage.getItem("SaveGame"));
+        let saveData = saveDataRaw.data;
 
         // TODO deal with version number
 
-        let saveData = saveDataRaw.data;
+        // load stats
+        Stats.replaceState(Utils.convertObjectToBig(saveDataRaw.stats));
 
         // parse big/orders data
         let orders = {};

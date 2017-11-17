@@ -1,6 +1,4 @@
-IDEAS
-show time to prestige in console!
-make something happen when you hit infinity
+win game when you hit infinity
 ===
 menu:
 hard reset

@@ -67,6 +67,7 @@
 
 <script>
 import Big from "big.js";
+import Stats from "./modules/stats.js";
 import Utils from "./modules/utils.js";
 import Orders from "./modules/orders.js";
 import SaveLoad from "./modules/saveLoad.js";
@@ -93,9 +94,9 @@ function defaultData() {
     return {
         // debug flags
         disableAutoSave: false,
-        disableAutoLoad: false,
+        disableAutoLoad: true,
         startingCurrency: Big(0),
-        cheatMode: false,
+        cheatMode: true,
 
         // for tick function
         lastFrame: null,
@@ -249,6 +250,9 @@ export default {
                 return;
             }
 
+            console.log("Prestige time: " + Stats.state.timePlayedThisPrestige.toString() + " seconds");
+            Stats.commit('newPrestige');
+
             // load default data
             let newData = defaultData();
             
@@ -312,6 +316,9 @@ export default {
             if (this.startingCurrency.gt(0)) {
                 this.stuff = this.startingCurrency;
             }
+
+            // save
+            this.saveGame();
         },
         saveGame() {
             SaveLoad.save(this.$data);
@@ -370,6 +377,11 @@ export default {
         }
 
         window.requestAnimationFrame(this.tick);
+
+        // timers
+        setInterval(function () {
+            Stats.commit('addTime', 1);
+        }.bind(this), 1000);
 
         // auto save
         setInterval(function () {

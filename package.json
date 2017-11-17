@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "material-design-icons": "^3.0.1",
-    "vue": "^2.5.5"
+    "vue": "^2.5.5",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
