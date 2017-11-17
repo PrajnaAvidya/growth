@@ -4,9 +4,9 @@
             <div>
                 <h5>You have <strong>{{ stuff | stuff }}</strong> stuff.</h5>
                 <h6>You are gaining {{ stuffPerSecond | stuff }} stuff per second.</h6>
-                <div>Goal: get to <strong>∞</strong> stuff</div>
+                <div>(Goal: get to <strong>∞</strong> stuff)</div>
                 <hr />
-                <div>Slow down time by {{ tickSpeedReductionPercent }} percent.</div>
+                <div>Slow down time by {{ tickSpeedReductionPercent }}%</div>
                 <v-btn v-on:click="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | whole }}</v-btn>
                 <v-btn v-on:click="upgradeTickSpeedMax()" :disabled="stuff.lt(tickSpeedCost)">Buy Max</v-btn>
                 <h6>Time speed: {{ tickSpeedDisplayed }}</h6>
@@ -14,11 +14,11 @@
             <hr />
             <v-layout v-for="(order, orderIndex) in orders" :key="orderIndex" v-show="orderIndex==1 || (orderIndex <= resetOrder && orders[orderIndex-1].owned > 0)">
                 <v-flex sm4>
-                    <h4 v-if="orderIndex==1">Stuff/sec = {{ order.name }} * {{ order.multiplier | multiplier }}</h4>
-                    <h4 v-else>{{ orders[orderIndex-1].name }}/sec = {{ order.name }} * {{ order.multiplier/10 | multiplier }}</h4>
+                    <h4 v-if="orderIndex==1">Stuff/s = {{ order.name }} * {{ order.multiplier | multiplier }}</h4>
+                    <h4 v-else>{{ orders[orderIndex-1].name }}/s = {{ order.name }} * {{ order.multiplier/10 | multiplier }}</h4>
                 </v-flex>
                 <v-flex sm4>
-                    <h6>{{ order.name }} = {{ order.owned | whole }} ({{ order.bought }}/10 for multiplier) (+{{ order.increasePercentage }}%/s)</h6>
+                    <h6>{{ order.name }} = {{ order.owned | whole }} (+{{ order.increasePercentage }}%/s) <small>(bought {{ order.bought }}/10 for multiplier)</small></h6>
                 </v-flex>
                 <v-flex sm4>
                     <v-btn v-on:click="buyOrder(order)" :disabled="stuff.lt(order.cost)">
