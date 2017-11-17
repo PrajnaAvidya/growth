@@ -2,8 +2,6 @@ IDEAS
 show time to prestige in console!
 make something happen when you hit infinity
 ===
-more mathematical-looking front end ui
-===
 menu:
 hard reset
 basic options (toggle scientific notation)
