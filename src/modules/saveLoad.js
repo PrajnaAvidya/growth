@@ -42,32 +42,38 @@ export default {
         });
 
         let gameData = {
+            lastFrame: null,
+
+            // stuff/tickspeed
             stuff: Big(saveData.stuff),
             stuffPerSecond: Big(saveData.stuffPerSecond),
-            stuffPerSecondDisplayed: Big(saveData.stuffPerSecondDisplayed),
-
             tickSpeed: Big(saveData.tickSpeed),
             tickSpeedDisplayed: saveData.tickSpeedDisplayed,
-            tickSpeedMultiplier: saveData.tickSpeedMultiplier,
-            tickSpeedCost: Big(saveData.tickSpeedCost),
             tickSpeedReductionPercent: saveData.tickSpeedReductionPercent,
+            tickSpeedCost: Big(saveData.tickSpeedCost),
             
-            lastFrame: null,
-            highestOrder: saveData.highestOrder,
+            // orders/multiplier
             multiplierLevel: saveData.multiplierLevel,
+            highestOrder: saveData.highestOrder,
+            highestOrderAllowed: saveData.highestOrderAllowed,
+            addOrderResetsRequired: saveData.addOrderResetsRequired,
+            addOrderCost: saveData.addOrderCost,
 
+            // reset/prestige
+            showReset: false,
             resetOrder: saveData.resetOrder,
             resetAmount: saveData.resetAmount,
-            resetCurrency: saveData.resetCurrency,
-            resetCurrencyUnlockedThisRun: saveData.resetCurrencyUnlockedThisRun,
             resetCount: saveData.resetCount,
-            resetCountPower: saveData.resetCountPower,
             resetCountTickSpeed: saveData.resetCountTickSpeed,
             resetCountMultiplier: saveData.resetCountMultiplier,
-            resetCostPower: saveData.resetCostPower,
             resetCostTickSpeed: saveData.resetCostTickSpeed,
             resetCostMultiplier: saveData.resetCostMultiplier,
+            resetCurrency: saveData.resetCurrency,
+            resetCurrencySpent: saveData.resetCurrencySpent,
+            resetCurrencyReward: saveData.resetCurrencyReward,
+            resetCurrencyUnlockedThisRun: saveData.resetCurrencyUnlockedThisRun,
 
+            // order data
             orders: orders,
         };
         return gameData;

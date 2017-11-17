@@ -1,41 +1,41 @@
 export default [
     {
-        name: 'First',
+        name: 'x',
         cost: 10,
         costMultiplier: 1000,
     },
     {
-        name: 'Second',
+        name: 'y',
         cost: 100,
         costMultiplier: 10000,
     },
     {
-        name: 'Third',
+        name: 'z',
         cost: 10000,
         costMultiplier: 100000,
     },
     {
-        name: 'Fourth',
+        name: 'x\'',
         cost: 1E6,
         costMultiplier: 1E6,
     },
     {
-        name: 'Fifth',
+        name: 'y\'',
         cost: 1E9,
         costMultiplier: 1E6,
     },
     {
-        name: 'Sixth',
+        name: 'z\'',
         cost: 10E12,
         costMultiplier: 10E9,
     },
     {
-        name: 'Seventh',
+        name: 'λ',
         cost: 1E18,
         costMultiplier: 1E12,
     },
     {
-        name: 'Eighth',
+        name: 'φ',
         cost: 1E24,
         costMultiplier: 1E15,
     },

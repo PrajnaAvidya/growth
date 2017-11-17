@@ -38,7 +38,7 @@ export default {
             return value.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
         }
 
-        return "Infinity";
+        return "∞";
     },
 
     convertObjectToBig(objectData) {
