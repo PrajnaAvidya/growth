@@ -10,6 +10,9 @@ import 'vuetify/dist/vuetify.min.css';
 import 'material-design-icons/iconfont/material-icons.css';
 
 import Game from './game';
+import GameMenu from './components/GameMenu.vue';
+
+Vue.component('GameMenu', GameMenu);
 
 Vue.config.productionTip = false;
 

@@ -1,4 +1,5 @@
 import Big from "big.js";
+import Options from "./options.js";
 
 export default {
     round(value, decimal=false) {
@@ -13,6 +14,10 @@ export default {
         
         if (value <= 999) {
             return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        if (Options.state.notation) {
+            return value.toExponential(3);
         }
         
         if (value.lt("1E36")) {

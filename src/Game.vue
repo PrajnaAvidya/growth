@@ -1,6 +1,13 @@
 <template>
     <v-app>
-        <v-container fluid="fluid">
+        <v-dialog v-model="showLoading" persistent>
+            <v-card>
+                <v-card-title class="headline">Loading game assets</v-card-title>
+                <v-card-text>Please wait a moment, game is loading...</v-card-text>
+            </v-card>
+        </v-dialog>
+
+        <v-container fluid="fluid" v-bind:class="{ hide: showLoading }">
             <div>
                 <h5>You have <strong>{{ stuff | stuff }}</strong> stuff.</h5>
                 <h6>You are gaining {{ stuffPerSecond | stuff }} stuff per second.</h6>
@@ -62,82 +69,31 @@
             </div>
             
         </v-container>
+
+        <v-footer class="pa-3">
+            <div>{{ gameVersion() }}</div>
+            <v-spacer></v-spacer>
+            <GameMenu></GameMenu>
+            
+        </v-footer>
     </v-app>
 </template>
 
 <script>
 import Big from "big.js";
+import Version from "./modules/version.js";
+import EventBus from './modules/eventBus.js';
+import DefaultData from './modules/defaultData.js';
+import Options from "./modules/options.js";
 import Stats from "./modules/stats.js";
 import Utils from "./modules/utils.js";
 import Orders from "./modules/orders.js";
+import GameMenu from "./components/GameMenu.vue";
 import SaveLoad from "./modules/saveLoad.js";
-
-function defaultData() {
-    // generate orders from data
-    let orders = {};
-    let orderNumber = 1;
-    Orders.forEach(function (orderData) {
-        orders[orderNumber] = {
-            name: orderData.name,
-            multiplier: Big(1),
-            cost: Big(orderData.cost),
-            costMultiplier: Big(orderData.costMultiplier),
-            costToMultiplier: Big(orderData.cost).times(10),
-            owned: Big(0),
-            bought: 0,
-            increasePercentage: 0.00,
-        };
-
-        orderNumber ++;
-    });
-
-    return {
-        // debug flags
-        disableAutoSave: false,
-        disableAutoLoad: true,
-        startingCurrency: Big(0),
-        cheatMode: true,
-
-        // for tick function
-        lastFrame: null,
-
-        // stuff/tickspeed
-        stuff: Big(10),
-        stuffPerSecond: Big(0),
-        tickSpeed: Big(1),
-        tickSpeedDisplayed: "100%",
-        tickSpeedReductionPercent: 10,
-        tickSpeedCost: Big(100),
-
-        // orders/multiplier
-        multiplierLevel: 0,
-        highestOrder: 8,
-        highestOrderAllowed: 4,
-        addOrderResetsRequired: 2,
-        addOrderCost: 1,
-
-        // reset/prestige
-        showReset: false,
-        resetOrder: 4,
-        resetAmount: 20,
-        resetCount: 0,
-        resetCountTickSpeed: 0,
-        resetCountMultiplier: 0,
-        resetCostTickSpeed: 1,
-        resetCostMultiplier: 1,
-        resetCurrency: 0,
-        resetCurrencySpent: 0,
-        resetCurrencyReward: 1,
-        resetCurrencyUnlockedThisRun: false,
-        
-        // order data
-        orders: orders,
-    }
-}
 
 export default {
     data: function() {
-        return defaultData();
+        return DefaultData.data();
     },
 
     filters: {
@@ -153,6 +109,9 @@ export default {
     },
 
     methods: {
+        gameVersion() {
+            return Version.gameVersion;
+        },
         buyOrder(order) {
             if (this.stuff.lt(order.cost)) {
                 return;
@@ -315,10 +274,11 @@ export default {
             // add starting currency if defined
             if (this.startingCurrency.gt(0)) {
                 this.stuff = this.startingCurrency;
-            }
+            }  
 
-            // save
+            // save & update stats
             this.saveGame();
+            EventBus.$emit('updateStats');
         },
         saveGame() {
             SaveLoad.save(this.$data);
@@ -362,33 +322,71 @@ export default {
 
             window.requestAnimationFrame(this.tick);
         },
-    },
+        async setupGame() {
+            if (!this.disableAutoLoad && localStorage.getItem("SaveGame") != null) {
+                await this.loadGame();
+            } else {
+                await this.newGame();
+            }
 
-    mounted() {
-        if (!this.disableAutoLoad && localStorage.getItem("SaveGame") != null) {
-            let saveData = SaveLoad.load();
-            Object.assign(this.$data, saveData);
-            console.log("Loaded");
-        } else {
-            console.log("New");
+            // update option/stats in menu
+            EventBus.$emit('updateOptions');
+            EventBus.$emit('updateStats');
+
+            // add event listeners
+            EventBus.$on('hardReset', this.hardReset);
+
+            // timers
+            setInterval(function () {
+                Stats.commit('addTime', 1);
+            }.bind(this), 1000);
+
+            // auto save
+            setInterval(function () {
+                if (!this.disableAutoSave) {
+                    this.saveGame();
+                }
+            }.bind(this), 5000);
+
+            window.requestAnimationFrame(this.tick);
+        },
+        async newGame() {
+            // load default data
+            Object.assign(this.$data, DefaultData.data());
+
+            // reset stats/options
+            Stats.commit('resetState');
+            Options.commit('resetState');
+
+            EventBus.$emit('closeMenu');
+
             if (this.startingCurrency.gt(0)) {
                 this.stuff = this.startingCurrency;
             }
-        }
 
-        window.requestAnimationFrame(this.tick);
+            this.showLoading = false;
+        },
+        async loadGame() {
+            Object.assign(this.$data, SaveLoad.load());
 
-        // timers
-        setInterval(function () {
-            Stats.commit('addTime', 1);
-        }.bind(this), 1000);
+            console.log("Game Loaded");
+        },
+        async hardReset() {
+            // start new game
+            await this.newGame();
 
-        // auto save
-        setInterval(function () {
-            if (!this.disableAutoSave) {
-                this.saveGame();
-            }
-        }.bind(this), 5000);
+            EventBus.$emit('updateOptions');
+            EventBus.$emit('updateStats');
+
+            // save game
+            this.saveGame();
+
+            this.showLoading = false;
+        },
+    },
+
+    mounted() {
+        this.setupGame();
     }
 }
 </script>

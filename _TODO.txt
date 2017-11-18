@@ -1,9 +1,13 @@
 win game when you hit infinity
 ===
+ticker headlines from reddit
+===
+more stats:
+total stuff earned (every prestige)
+highest stuff
+highest stuff per second
+===
 menu:
-hard reset
-basic options (toggle scientific notation)
-stats
 import/export save
 ===
 some way to unlock a 9th order

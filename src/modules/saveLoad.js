@@ -1,18 +1,16 @@
 import Big from "big.js";
+import Version from "./version.js";
 import Utils from "./utils.js";
+import Options from './options.js';
 import Stats from './stats.js';
 import Orders from "./orders.js";
-
-function getSaveVersion() {
-    return '1';
-}
 
 export default {
     save(data) {
         let saveData = {
-            version: getSaveVersion(),
+            version: Version.saveVersion,
             data: data,
-
+            options: Options.state,
             stats: Stats.state,
         };
 
@@ -27,10 +25,12 @@ export default {
         // load save data
         let saveDataRaw = JSON.parse(localStorage.getItem("SaveGame"));
         let saveData = saveDataRaw.data;
+        if (saveDataRaw.version != Version.saveVersion) {
+            // TODO deal with version number
+        }
 
-        // TODO deal with version number
-
-        // load stats
+        // load stats/options
+        Options.replaceState(saveData.options);
         Stats.replaceState(Utils.convertObjectToBig(saveDataRaw.stats));
 
         // parse big/orders data
