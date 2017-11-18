@@ -26,7 +26,7 @@ export default {
             disableAutoSave: false,
             disableAutoLoad: false,
             startingCurrency: Big(0),
-            cheatMode: true,
+            cheatMode: false,
     
             // ui
             showLoading: true,

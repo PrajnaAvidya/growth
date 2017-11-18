@@ -59,15 +59,27 @@
                                     </v-list-tile>
 
                                     <v-list-tile>
+                                        Highest Stuff Achieved: {{ getStat('highestStuff') }}
+                                    </v-list-tile>
+
+                                    <v-list-tile>
+                                        Highest Stuff per Second Achieved: {{ getStat('highestStuffPerSecond') }}
+                                    </v-list-tile>
+
+                                    <v-list-tile>
                                         Time Played: {{ getStat('timePlayed') }}
                                     </v-list-tile>
 
                                     <v-list-tile v-if="getStat('timesPrestiged') > 0">
-                                        Time Played (this prestige): {{ getStat('timePlayedThisPrestige') }}
+                                        Time Played (this reset): {{ getStat('timePlayedThisPrestige') }}
                                     </v-list-tile>
 
                                     <v-list-tile v-if="getStat('timesPrestiged') > 0">
-                                        Times Prestiged: {{ getStat('timesPrestiged') }}
+                                        Times Reset: {{ getStat('timesPrestiged') }}
+                                    </v-list-tile>
+
+                                    <v-list-tile v-if="getStat('timesPrestiged') > 0">
+                                        Total Stuff Across All Resets: {{ getStat('totalStuff') }}
                                     </v-list-tile>
                                 </v-list>
                             </v-card-text>
@@ -137,6 +149,9 @@
                         this.stats[key] = Utils.round(Stats.state[key], true);
                     }
                 }
+
+                // compute total stuff earned
+                this.stats['totalStuff'] = Utils.round(Stats.state.stuff.plus(Stats.state.totalStuffOldPrestiges));
             },
             updateOptions() {
                 this.watchOptions = false;

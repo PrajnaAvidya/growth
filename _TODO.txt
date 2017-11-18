@@ -2,10 +2,8 @@ better win screen
 ===
 ticker headlines from reddit
 ===
-more stats:
-total stuff earned (every prestige)
-highest stuff
-highest stuff per second
+more stats?
+reset vs prestige
 ===
 menu:
 import/export save
