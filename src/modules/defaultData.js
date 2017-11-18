@@ -26,10 +26,11 @@ export default {
             disableAutoSave: false,
             disableAutoLoad: false,
             startingCurrency: Big(0),
-            cheatMode: false,
+            cheatMode: true,
     
             // ui
             showLoading: true,
+            wonGame: false,
     
             // for tick function
             lastFrame: null,

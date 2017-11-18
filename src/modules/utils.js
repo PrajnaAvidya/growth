@@ -16,7 +16,7 @@ export default {
             return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        if (Options.state.notation) {
+        if (Options.state.notation && value.lt("1E303")) {
             return value.toExponential(3);
         }
         

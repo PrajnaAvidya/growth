@@ -7,6 +7,15 @@
             </v-card>
         </v-dialog>
 
+        <v-dialog v-model="wonGame" fullscreen>
+            <v-card>
+                <v-card-title class="headline">You Won!</v-card-title>
+                <v-card-text>Holy shit you actually won!</v-card-text>
+                <v-card-text>Time Played: {{ getStat('timePlayed') }} seconds</v-card-text>
+                <v-card-text>Times Prestiged: {{ getStat('timesPrestiged') }}</v-card-text>
+            </v-card>>
+        </v-dialog>
+
         <v-container fluid="fluid" v-bind:class="{ hide: showLoading }">
             <div>
                 <h5>You have <strong>{{ stuff | stuff }}</strong> stuff.</h5>
@@ -112,6 +121,13 @@ export default {
         gameVersion() {
             return Version.gameVersion;
         },
+        getOption(option) {
+            return Options.state[option];
+        },
+        getStat(stat) {
+            return Stats.state[stat].toString();
+        },
+
         buyOrder(order) {
             if (this.stuff.lt(order.cost)) {
                 return;
@@ -286,6 +302,10 @@ export default {
             console.log("Game Saved");
         },
         tick(timestamp) {
+            if (this.wonGame) {
+                return;
+            }
+
             // get time since last frame
             let progress = timestamp - this.lastFrame;
             this.lastFrame = timestamp;
@@ -321,6 +341,11 @@ export default {
                 this.resetCurrencyUnlockedThisRun = true;
             }
 
+            // check if won
+            if (Utils.round(this.stuff) == '∞') {
+                this.wonGame = true;
+            }
+
             window.requestAnimationFrame(this.tick);
         },
         async setupGame() {
@@ -339,12 +364,14 @@ export default {
 
             // timers
             setInterval(function () {
-                Stats.commit('addTime', 1);
+                if (!this.wonGame) {
+                    Stats.commit('addTime', 1);
+                }
             }.bind(this), 1000);
 
             // auto save
             setInterval(function () {
-                if (!this.disableAutoSave) {
+                if (!this.disableAutoSave && !this.wonGame) {
                     this.saveGame();
                 }
             }.bind(this), 5000);
