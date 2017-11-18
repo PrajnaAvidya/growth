@@ -7,6 +7,8 @@
             </v-card>
         </v-dialog>
 
+        <div id="news" style="transform: translateX(-707px); transition: transform 18.39s linear;">Test1234</div>        
+
         <v-container fluid="fluid" v-bind:class="{ hide: showLoading }">
             <div>
                 <h5>You have <strong>{{ stuff | stuff }}</strong> stuff.</h5>
@@ -70,7 +72,7 @@
             
         </v-container>
 
-        <v-footer class="pa-3">
+        <v-footer class="pa-3" v-bind:class="{ hide: showLoading }">
             <div>{{ gameVersion() }}</div>
             <v-spacer></v-spacer>
             <GameMenu></GameMenu>
@@ -87,6 +89,7 @@ import DefaultData from './modules/defaultData.js';
 import Options from "./modules/options.js";
 import Stats from "./modules/stats.js";
 import Utils from "./modules/utils.js";
+import FlavorText from "./modules/flavorText.js";
 import Orders from "./modules/orders.js";
 import GameMenu from "./components/GameMenu.vue";
 import SaveLoad from "./modules/saveLoad.js";
@@ -359,6 +362,10 @@ export default {
             Stats.commit('resetState');
             Options.commit('resetState');
 
+            // get flavor texts
+            this.flavorTexts = await FlavorText.getTitles();
+            this.flavorTexts = Utils.shuffleArray(this.flavorTexts);
+
             EventBus.$emit('closeMenu');
 
             if (this.startingCurrency.gt(0)) {
@@ -369,6 +376,8 @@ export default {
         },
         async loadGame() {
             Object.assign(this.$data, SaveLoad.load());
+
+            this.flavorTexts = Utils.shuffleArray(this.flavorTexts);
 
             this.showLoading = false;
 
@@ -395,5 +404,18 @@ export default {
 </script>
 
 <style>
+    #news {
+        color: #000000;
+        /*transition: transform 1s;*/
+        position: relative;
+        display: inline-block;
+        font-family: Typewriter;
+        font-size: 15px;
+        white-space: nowrap;
+        font-weight: bold
+    }
 
+    .hide {
+        display: none;
+    }
 </style>

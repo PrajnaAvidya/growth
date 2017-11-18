@@ -24,12 +24,13 @@ export default {
         return {
             // debug flags
             disableAutoSave: false,
-            disableAutoLoad: false,
+            disableAutoLoad: true,
             startingCurrency: Big(0),
-            cheatMode: false,
+            cheatMode: true,
     
             // ui
             showLoading: true,
+            flavorTexts: [],
     
             // for tick function
             lastFrame: null,

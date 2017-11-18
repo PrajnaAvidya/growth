@@ -54,6 +54,9 @@ export default {
         let gameData = {
             lastFrame: null,
 
+            // ui
+            flavorTexts: saveData.flavorTexts,
+
             // stuff/tickspeed
             stuff: Big(saveData.stuff),
             stuffPerSecond: Big(saveData.stuffPerSecond),
