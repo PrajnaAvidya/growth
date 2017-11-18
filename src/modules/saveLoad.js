@@ -30,7 +30,7 @@ export default {
         }
 
         // load stats/options
-        Options.replaceState(saveData.options);
+        Options.replaceState(saveDataRaw.options);
         Stats.replaceState(Utils.convertObjectToBig(saveDataRaw.stats));
 
         // parse big/orders data

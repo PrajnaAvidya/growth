@@ -213,7 +213,8 @@ export default {
             Stats.commit('newPrestige');
 
             // load default data
-            let newData = defaultData();
+            let newData = DefaultData.data();
+            newData.showLoading = false;
             
             // load prestige data
             newData.resetOrder = 4;
@@ -282,7 +283,7 @@ export default {
         },
         saveGame() {
             SaveLoad.save(this.$data);
-            console.log("Saved");
+            console.log("Game Saved");
         },
         tick(timestamp) {
             // get time since last frame
@@ -368,6 +369,8 @@ export default {
         },
         async loadGame() {
             Object.assign(this.$data, SaveLoad.load());
+
+            this.showLoading = false;
 
             console.log("Game Loaded");
         },
