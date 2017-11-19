@@ -32,8 +32,9 @@ export default {
             showLoading: true,
             wonGame: false,
     
-            // for tick function
+            // for tick function/timers
             lastFrame: null,
+            lastInterval: null,
     
             // stuff/tickspeed
             stuff: Big(10),

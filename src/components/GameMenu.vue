@@ -174,12 +174,7 @@
             });
             EventBus.$on('updateStats', function () {
                 vm.updateStats();
-            })
-
-            // update stats every few seconds
-            setInterval(function () {
-                this.updateStats();
-            }.bind(this), 3000);
+            });
         }
     };
 </script>

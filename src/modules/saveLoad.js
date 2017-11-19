@@ -53,6 +53,7 @@ export default {
 
         let gameData = {
             lastFrame: null,
+            lastInterval: null,
 
             // stuff/tickspeed
             stuff: Big(saveData.stuff),

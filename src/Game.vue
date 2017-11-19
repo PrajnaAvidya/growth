@@ -346,6 +346,17 @@ export default {
                 this.wonGame = true;
             }
 
+            // check for interval
+            if (timestamp - this.lastInterval > 5000) {
+                let interval = (timestamp - this.lastInterval)/1000;
+
+                Stats.commit('addTime', interval);
+                EventBus.$emit('updateStats');
+                this.saveGame();
+
+                this.lastInterval = timestamp;
+            }
+
             window.requestAnimationFrame(this.tick);
         },
         async setupGame() {
@@ -361,20 +372,6 @@ export default {
 
             // add event listeners
             EventBus.$on('hardReset', this.hardReset);
-
-            // timers
-            setInterval(function () {
-                if (!this.wonGame) {
-                    Stats.commit('addTime', 1);
-                }
-            }.bind(this), 1000);
-
-            // auto save
-            setInterval(function () {
-                if (!this.disableAutoSave && !this.wonGame) {
-                    this.saveGame();
-                }
-            }.bind(this), 5000);
 
             window.requestAnimationFrame(this.tick);
         },

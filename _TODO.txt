@@ -3,7 +3,7 @@ better win screen
 ticker headlines from reddit
 ===
 more stats?
-reset vs prestige
+track resets vs prestiges (reset at highest power)
 ===
 menu:
 import/export save
