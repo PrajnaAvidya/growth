@@ -2,6 +2,10 @@ better win screen
 ===
 ticker headlines from reddit
 ===
+maybe make power unlock available when 1 owned of previous (instead of 20)
+otherwise progression is much slower
+definitely needs rework with how low the price is when you unlock next tier
+===
 more stats?
 track resets vs prestiges (reset at highest power)
 ===

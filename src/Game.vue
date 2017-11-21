@@ -34,7 +34,7 @@
                     <h4 v-else>{{ orders[orderIndex-1].name }}/s = {{ order.name }} * {{ order.multiplier/10 | multiplier }}</h4>
                 </v-flex>
                 <v-flex sm4>
-                    <h6>{{ order.name }} = {{ order.owned | whole }} (+{{ order.increasePercentage }}%/s) <small>(bought {{ order.bought }}/10 for multiplier)</small></h6>
+                    <h6>{{ order.name }} = {{ order.owned | whole }} (+{{ order.increasePercentage }}%/s) <small>(buy {{ 10-order.bought }} multiplier)</small></h6>
                 </v-flex>
                 <v-flex sm4>
                     <v-btn v-on:click="buyOrder(order)" :disabled="stuff.lt(order.cost)">
@@ -48,7 +48,7 @@
 
             <div v-show="orders[resetOrder].owned > 0">
                 <div v-show="!canReset()">
-                    Once you reach {{ resetAmount }} owned of {{ orders[resetOrder].name }} Power you can reset with a boost.
+                    Once you reach {{ resetAmount }} owned of {{ orders[resetOrder].name }} you can reset with a boost.
                 </div>
                 <v-btn v-on:click="showReset = !showReset" :disabled="!canReset()" >Toggle Reset</v-btn>
 
