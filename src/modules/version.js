@@ -1,4 +1,4 @@
 export default {
-    gameVersion: 'Alpha 1.1',
-    saveVersion: '1',
+    gameVersion: 'Alpha 1.2',
+    saveVersion: '2',
 };

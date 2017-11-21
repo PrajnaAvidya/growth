@@ -24,12 +24,18 @@ export default {
     load() {
         // load save data
         let saveDataRaw = JSON.parse(localStorage.getItem("SaveGame"));
-        let saveData = saveDataRaw.data;
-        if (saveDataRaw.version != Version.saveVersion) {
-            // TODO deal with version number
-        }
 
-        // load stats/options
+        // deal with out of date save version
+        if (saveDataRaw.version != Version.saveVersion) {
+            console.log("Patching save file to latest version");
+            if (saveDataRaw.version == '1') {
+                saveDataRaw.data.resetAmount = 20;
+            }
+        }
+        
+
+        // load data/stats/options
+        let saveData = saveDataRaw.data;
         Options.replaceState(saveDataRaw.options);
         Stats.replaceState(Utils.convertObjectToBig(saveDataRaw.stats));
 

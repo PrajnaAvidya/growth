@@ -270,9 +270,9 @@ export default {
             }
 
             // check if at highest order so increment order amount
-            if (this.resetOrder == this.highestOrder) {
+            /*if (this.resetOrder == this.highestOrder) {
                 newData.resetAmount = this.resetAmount + 20;
-            }
+            }*/
 
             // apply multipliers
             for (let multiplier = 1; multiplier <= newData.multiplierLevel; multiplier ++) {
