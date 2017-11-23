@@ -308,6 +308,11 @@ export default {
 
             // get time since last frame
             let progress = timestamp - this.lastFrame;
+            // restrict game to 20 fps
+            if (progress < 50) {
+                window.requestAnimationFrame(this.tick);
+                return;
+            }
             this.lastFrame = timestamp;
 
             // how much to update current frame (factoring in tickspeed)
