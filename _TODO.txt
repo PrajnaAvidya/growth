@@ -39,3 +39,5 @@ exponential notation:
 36E = U(Dc)
 39E = D(Dc)
 42E = T(Dc)
+
+<!DOCTYPE html><html><head><meta charset=utf-8><title>Growth</title><link href=/static/css/app.da7e5059ebb67d8573d22765c88fb844.css rel=stylesheet><script async src="https://www.googletagmanager.com/gtag/js?id=UA-109960428-1"></script><script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'UA-109960428-1');</script></head>

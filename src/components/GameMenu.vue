@@ -142,7 +142,7 @@
                 this.stats = {};
                 for (let key in Stats.state) {
                     if (key == 'timePlayed' || key == 'timePlayedThisPrestige') {
-                        this.stats[key] = Stats.state[key].toString() + ' seconds';
+                        this.stats[key] = Utils.round(Stats.state[key]) + ' seconds';
                     } else if (key == 'timesPrestiged') {
                         this.stats[key] = Stats.state[key].toString();
                     } else {

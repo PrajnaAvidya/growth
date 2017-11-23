@@ -11,7 +11,7 @@
             <v-card>
                 <v-card-title class="headline">You Won!</v-card-title>
                 <v-card-text>Holy shit you actually won!</v-card-text>
-                <v-card-text>Time Played: {{ getStat('timePlayed') }} seconds</v-card-text>
+                <v-card-text>Time Played: {{ getStat('timePlayed') | whole }} seconds</v-card-text>
                 <v-card-text>Times Prestiged: {{ getStat('timesPrestiged') }}</v-card-text>
             </v-card>>
         </v-dialog>
@@ -34,7 +34,7 @@
                     <h4 v-else>{{ orders[orderIndex-1].name }}/s = {{ order.name }} * {{ order.multiplier/10 | multiplier }}</h4>
                 </v-flex>
                 <v-flex sm4>
-                    <h6>{{ order.name }} = {{ order.owned | whole }} (+{{ order.increasePercentage }}%/s) <small>(buy {{ 10-order.bought }} multiplier)</small></h6>
+                    <h6>{{ order.name }} = {{ order.owned | whole }} (+{{ order.increasePercentage }}%/s) <small>(buy {{ 10-order.bought }} for multiplier)</small></h6>
                 </v-flex>
                 <v-flex sm4>
                     <v-btn v-on:click="buyOrder(order)" :disabled="stuff.lt(order.cost)">
