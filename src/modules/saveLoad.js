@@ -18,21 +18,21 @@ export default {
         Stats.commit('setStuff', saveData.data.stuff);
         Stats.commit('setStuffPerSecond', saveData.data.stuffPerSecond);
 
-        localStorage.setItem("SaveGame", JSON.stringify(saveData));
+        localStorage.setItem("GrowthSaveGame", JSON.stringify(saveData));
     },
 
     load() {
         // load save data
-        let saveDataRaw = JSON.parse(localStorage.getItem("SaveGame"));
+        let saveDataRaw = JSON.parse(localStorage.getItem("GrowthSaveGame"));
+        console.log(saveDataRaw)
 
         // deal with out of date save version
-        if (saveDataRaw.version != Version.saveVersion) {
-            console.log("Patching save file to latest version");
-            if (saveDataRaw.version == '1') {
+        if (saveDataRaw.version !== Version.saveVersion) {
+            //console.log("Patching save file to latest version");
+            if (saveDataRaw.version === '1') {
                 saveDataRaw.data.resetAmount = 20;
             }
         }
-        
 
         // load data/stats/options
         let saveData = saveDataRaw.data;

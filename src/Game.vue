@@ -1,13 +1,19 @@
 <template>
     <v-app>
-        <v-dialog v-model="showLoading" persistent>
+        <v-dialog
+            v-model="showLoading"
+            persistent
+        >
             <v-card>
                 <v-card-title class="headline">Loading game assets</v-card-title>
                 <v-card-text>Please wait a moment, game is loading...</v-card-text>
             </v-card>
         </v-dialog>
 
-        <v-dialog v-model="wonGame" fullscreen>
+        <v-dialog
+            v-model="wonGame"
+            fullscreen
+        >
             <v-card>
                 <v-card-title class="headline">You Won!</v-card-title>
                 <v-card-text>Holy shit you actually won!</v-card-text>
@@ -16,19 +22,36 @@
             </v-card>>
         </v-dialog>
 
-        <v-container fluid="fluid" v-bind:class="{ hide: showLoading }">
+        <v-container
+            fluid="fluid"
+            :class="{ hide: showLoading }"
+        >
             <div>
                 <h5>You have <strong>{{ stuff | stuff }}</strong> stuff.</h5>
                 <h6>You are gaining {{ stuffPerSecond | stuff }} stuff per second.</h6>
                 <div>(Goal: get to <strong>∞</strong> stuff)</div>
-                <hr />
+
+                <hr>
+
                 <div>Slow down time by {{ tickSpeedReductionPercent }}%</div>
-                <v-btn v-on:click="upgradeTickSpeed()" :disabled="stuff.lt(tickSpeedCost)">Cost: {{ tickSpeedCost | whole }}</v-btn>
-                <v-btn v-on:click="upgradeTickSpeedMax()" :disabled="stuff.lt(tickSpeedCost)">Buy Max</v-btn>
+                <v-btn
+                    @click="upgradeTickSpeed()"
+                    :disabled="stuff.lt(tickSpeedCost)"
+                >Cost: {{ tickSpeedCost | whole }}</v-btn>
+                <v-btn
+                    @click="upgradeTickSpeedMax()"
+                    :disabled="stuff.lt(tickSpeedCost)"
+                >Buy Max</v-btn>
                 <h6>Time speed: {{ tickSpeedDisplayed }}</h6>
             </div>
-            <hr />
-            <v-layout v-for="(order, orderIndex) in orders" :key="orderIndex" v-show="orderIndex==1 || (orderIndex <= resetOrder && orders[orderIndex-1].owned > 0)">
+
+            <hr>
+
+            <v-layout
+                v-for="(order, orderIndex) in orders"
+                :key="orderIndex"
+                v-show="orderIndex==1 || (orderIndex <= resetOrder && orders[orderIndex-1].owned > 0)"
+            >
                 <v-flex sm4>
                     <h4 v-if="orderIndex==1">Stuff/s = {{ order.name }} * {{ order.multiplier | multiplier }}</h4>
                     <h4 v-else>{{ orders[orderIndex-1].name }}/s = {{ order.name }} * {{ order.multiplier/10 | multiplier }}</h4>
@@ -37,12 +60,14 @@
                     <h6>{{ order.name }} = {{ order.owned | whole }} (+{{ order.increasePercentage }}%/s) <small>(buy {{ 10-order.bought }} for multiplier)</small></h6>
                 </v-flex>
                 <v-flex sm4>
-                    <v-btn v-on:click="buyOrder(order)" :disabled="stuff.lt(order.cost)">
-                        Buy (Cost: {{ order.cost | whole }})
-                    </v-btn>
-                    <v-btn v-on:click="buyMax(order)" :disabled="stuff.lt(order.costToMultiplier)">
-                        Buy {{ 10 - order.bought }} (Cost: {{ order.costToMultiplier| whole }})
-                    </v-btn>
+                    <v-btn
+                        @click="buyOrder(order)"
+                        :disabled="stuff.lt(order.cost)"
+                    >Buy (Cost: {{ order.cost | whole }})</v-btn>
+                    <v-btn
+                        @click="buyMax(order)"
+                        :disabled="stuff.lt(order.costToMultiplier)"
+                    >Buy {{ 10 - order.bought }} (Cost: {{ order.costToMultiplier| whole }})</v-btn>
                 </v-flex>
             </v-layout>
 
@@ -50,40 +75,66 @@
                 <div v-show="!canReset()">
                     Once you reach {{ resetAmount }} owned of {{ orders[resetOrder].name }} you can reset with a boost.
                 </div>
-                <v-btn v-on:click="showReset = !showReset" :disabled="!canReset()" >Toggle Reset</v-btn>
+                <v-btn
+                    @click="showReset = !showReset"
+                    :disabled="!canReset()"
+                >Toggle Reset</v-btn>
 
-                <v-tooltip top v-if="resetCount < addOrderResetsRequired">
-                    <v-btn v-show="resetOrder < highestOrder" slot="activator" disabled>Add another Power (Cost: {{ addOrderCost }} & no reset)</v-btn>
+                <v-tooltip
+                    top
+                    v-if="resetCount < addOrderResetsRequired"
+                >
+                    <v-btn
+                        v-show="resetOrder < highestOrder"
+                        slot="activator"
+                        disabled
+                    >Add another Power (Cost: {{ addOrderCost }} & no reset)</v-btn>
                     <span>Must reset {{ addOrderResetsRequired }} times at highest power to unlock</span>
                 </v-tooltip>
 
-                <v-btn v-show="resetOrder < highestOrder" v-on:click="addOrder()" :disabled="!canReset() || !canAddOrder()" v-else>Add another Power (Cost: {{ addOrderCost }} & no reset)</v-btn>
+                <v-btn
+                    v-show="resetOrder < highestOrder"
+                    @click="addOrder()"
+                    :disabled="!canReset() || !canAddOrder()"
+                    v-else
+                >Add another Power (Cost: {{ addOrderCost }} & no reset)</v-btn>
 
                 <div v-show="showReset">
-                    Resets (at highest power): {{ resetCount }} <br />
-                    Reset currency stored: {{ resetCurrency }} <br />
-                    Reset currency spent: {{ resetCurrencySpent }} <br />
+                    Resets (at highest power): {{ resetCount }} <br>
+                    Reset currency stored: {{ resetCurrency }} <br>
+                    Reset currency spent: {{ resetCurrencySpent }} <br>
 
-                    <v-btn v-on:click="reset('none')">Reset with no bonus (save reset currency)</v-btn>
+                    <v-btn
+                        @click="reset('none')"
+                    >Reset with no bonus (save reset currency)</v-btn>
 
-                    <br />
+                    <br>
 
-                    <v-btn v-show="tickSpeedReductionPercent < 99" v-on:click="reset('tickspeed')" :disabled="!canReset('tickspeed')">Increase Tickspeed multiplier (Cost: {{ resetCostTickSpeed  }})</v-btn>
-                    <v-btn v-on:click="reset('multiplier')" :disabled="!canReset('multiplier')">Increase Power multipliers (Cost: {{ resetCostMultiplier }})</v-btn>
+                    <v-btn
+                        v-show="tickSpeedReductionPercent < 99"
+                        @click="reset('tickspeed')"
+                        :disabled="!canReset('tickspeed')"
+                    >Increase Tickspeed multiplier (Cost: {{ resetCostTickSpeed }})</v-btn>
+                    <v-btn
+                        @click="reset('multiplier')"
+                        :disabled="!canReset('multiplier')"
+                    >Increase Power multipliers (Cost: {{ resetCostMultiplier }})</v-btn>
                 </div>
             </div>
 
             <div v-show="cheatMode">
-                Cheat Mode: <v-btn v-on:click="stuff = stuff.times(1E3)">Add Stuff</v-btn>
+                Cheat Mode:
+                <v-btn
+                    @click="stuff = stuff.times(1E3)"
+                >Add Stuff</v-btn>
             </div>
             
         </v-container>
 
         <v-footer class="pa-3">
             <div>{{ gameVersion() }}</div>
-            <v-spacer></v-spacer>
-            <GameMenu></GameMenu>
-            
+            <v-spacer />
+            <GameMenu />
         </v-footer>
     </v-app>
 </template>
@@ -96,15 +147,9 @@ import DefaultData from './modules/defaultData.js';
 import Options from "./modules/options.js";
 import Stats from "./modules/stats.js";
 import Utils from "./modules/utils.js";
-import Orders from "./modules/orders.js";
-import GameMenu from "./components/GameMenu.vue";
 import SaveLoad from "./modules/saveLoad.js";
 
 export default {
-    data: function() {
-        return DefaultData.data();
-    },
-
     filters: {
         stuff(value) {
             return Utils.round(value, true);
@@ -115,6 +160,14 @@ export default {
         whole(value) {
             return Utils.round(value);
         }
+    },
+
+    data: function() {
+        return DefaultData.data();
+    },
+
+    mounted() {
+        this.setupGame();
     },
 
     methods: {
@@ -139,7 +192,7 @@ export default {
 
             order.costToMultiplier = Big(10).minus(order.bought).times(order.cost);
 
-            if (order.bought == 10) {
+            if (order.bought === 10) {
                 this.upgradeOrder(order);
             }
         },
@@ -205,19 +258,19 @@ export default {
             this.showReset = false;
         },
         canReset(resetType=null) {
-            if (!resetType || resetType == 'none') {
+            if (!resetType || resetType === 'none') {
                 return this.orders[this.resetOrder].owned.gte(this.resetAmount);
             }
             
-            if (resetType == 'tickspeed') {
+            if (resetType === 'tickspeed') {
                 return this.resetCurrency >= this.resetCostTickSpeed;
             }
             
-            if (resetType == 'multiplier') {
+            if (resetType === 'multiplier') {
                 return this.resetCurrency >=this.resetCostMultiplier;
             }
 
-            console.log("Invalid reset type: " + resetType);
+            //console.log("Invalid reset type: " + resetType);
             return false;
         },
         reset(resetType) {
@@ -225,7 +278,7 @@ export default {
                 return;
             }
 
-            console.log("Prestige time: " + Stats.state.timePlayedThisPrestige.toString() + " seconds");
+            //console.log("Prestige time: " + Stats.state.timePlayedThisPrestige.toString() + " seconds");
             Stats.commit('newPrestige');
 
             // load default data
@@ -234,12 +287,12 @@ export default {
             
             // load prestige data
             newData.resetOrder = 4;
-            if (this.resetOrder == this.highestOrderAllowed || (this.resetOrder == this.highestOrderAllowed - 1 && this.resetCount < this.addOrderResetsRequired)) {
+            if (this.resetOrder === this.highestOrderAllowed || (this.resetOrder === this.highestOrderAllowed - 1 && this.resetCount < this.addOrderResetsRequired)) {
                 newData.resetCount = this.resetCount + 1;
             } else {
                 newData.resetCount = this.resetCount;
             }
-            if (this.resetOrder == this.highestOrderAllowed) {
+            if (this.resetOrder === this.highestOrderAllowed) {
                 newData.highestOrderAllowed = this.highestOrderAllowed + 1;
             } else {
                 newData.highestOrderAllowed = this.highestOrderAllowed;
@@ -254,18 +307,18 @@ export default {
             newData.resetCurrencyUnlockedThisRun = false;
 
             // upgrade by reset type
-            if (resetType == 'tickspeed') {
+            if (resetType === 'tickspeed') {
                 newData.tickSpeedReductionPercent = this.tickSpeedReductionPercent + 1;
                 newData.resetCountTickSpeed = this.resetCountTickSpeed + 1;
                 newData.resetCurrency = this.resetCurrency - this.resetCostTickSpeed;
                 newData.resetCurrencySpent = this.resetCurrencySpent + this.resetCostTickSpeed;
-            } else if (resetType == 'multiplier') {
+            } else if (resetType === 'multiplier') {
                 newData.multiplierLevel = this.multiplierLevel + 1;
                 newData.resetCountMultiplier = this.resetCountMultiplier + 1;
                 newData.resetCurrency = this.resetCurrency - this.resetCostMultiplier;
                 newData.resetCurrencySpent = this.resetCurrencySpent + this.resetCostMultiplier;
-            } else if (resetType != 'none') {
-                console.log("Invalid reset type: " + resetType);
+            } else if (resetType !== 'none') {
+                //console.log("Invalid reset type: " + resetType);
                 return;
             }
 
@@ -299,7 +352,7 @@ export default {
         },
         saveGame() {
             SaveLoad.save(this.$data);
-            console.log("Game Saved");
+            //console.log("Game Saved");
         },
         tick(timestamp) {
             if (this.wonGame) {
@@ -308,8 +361,8 @@ export default {
 
             // get time since last frame
             let progress = timestamp - this.lastFrame;
-            // restrict game to 20 fps
-            if (progress < 50) {
+            // restrict game to 30 fps
+            if (progress < 33.333) {
                 window.requestAnimationFrame(this.tick);
                 return;
             }
@@ -321,7 +374,7 @@ export default {
 
             // increment orders
             for (let key in this.orders) {
-                if (key == 1) {
+                if (key === '1') {
                     continue;
                 }
 
@@ -347,7 +400,7 @@ export default {
             }
 
             // check if won
-            if (Utils.round(this.stuff) == '∞') {
+            if (Utils.round(this.stuff) === '∞') {
                 this.wonGame = true;
             }
 
@@ -365,7 +418,7 @@ export default {
             window.requestAnimationFrame(this.tick);
         },
         async setupGame() {
-            if (!this.disableAutoLoad && localStorage.getItem("SaveGame") != null) {
+            if (!this.disableAutoLoad && localStorage.getItem("GrowthSaveGame") !== null) {
                 await this.loadGame();
             } else {
                 await this.newGame();
@@ -401,7 +454,7 @@ export default {
 
             this.showLoading = false;
 
-            console.log("Game Loaded");
+            //console.log("Game Loaded");
         },
         async hardReset() {
             // start new game
@@ -416,10 +469,6 @@ export default {
             this.showLoading = false;
         },
     },
-
-    mounted() {
-        this.setupGame();
-    }
 }
 </script>
 

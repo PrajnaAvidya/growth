@@ -72,7 +72,7 @@ export default {
         let curr = len, prev = 0, output = [];
         
         while (input[curr]) {
-            if (input[curr++] == ' ') {
+            if (input[curr++] === ' ') {
                 output.push(input.substring(prev,curr));
                 prev = curr;
                 curr += len;
