@@ -13,29 +13,3 @@ menu:
 import/export save
 ===
 some way to unlock a 9th order
-===
-orders:
-1: 10 cost, 1k cost multiplier
-2: x10, x10
-3: x100, x10
-4: x1000, x10
-5: x1000, x100
-6: 10k, x100
-7: x100k, x100
-8: x1M, x1000
-===
-exponential notation:
-3E = K
-6E = M
-9E = B
-12E = T
-15E = Qa
-18E = Qi
-21E = Sx
-24E = Sp
-27E = Oc
-30E = No
-33E = Dc
-36E = U(Dc)
-39E = D(Dc)
-42E = T(Dc)
