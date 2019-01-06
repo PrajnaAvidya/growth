@@ -24,7 +24,7 @@ export default {
     load() {
         // load save data
         let saveDataRaw = JSON.parse(localStorage.getItem("GrowthSaveGame"));
-        console.log(saveDataRaw)
+        //console.log(saveDataRaw);
 
         // deal with out of date save version
         if (saveDataRaw.version !== Version.saveVersion) {
